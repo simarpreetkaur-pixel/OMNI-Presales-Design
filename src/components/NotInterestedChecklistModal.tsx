@@ -16,9 +16,9 @@ interface NotInterestedChecklistModalProps {
 }
 
 const questions = [
-  "Do you currently have car insurance?",
+  "Do you currently have a Car Insurance?",
   "When is your policy expiring?",
-  "What matters most for you when choosing insurance — price, claim service, or coverage?",
+  "What matters to you when choosing an insurance policy? Price, Claim service or coverage?",
 ];
 
 const NotInterestedChecklistModal = ({
@@ -101,7 +101,7 @@ const NotInterestedChecklistModal = ({
         {/* Content */}
         <div className="px-6 py-6 space-y-3 bg-white">
           <p className="text-xs font-semibold tracking-wider uppercase text-muted-foreground" style={{ letterSpacing: '0.5px' }}>
-            Ensure you've asked these questions ({checkedCount}/{questions.length})
+            Ensure you've asked these questions
           </p>
 
           <div className="space-y-3">

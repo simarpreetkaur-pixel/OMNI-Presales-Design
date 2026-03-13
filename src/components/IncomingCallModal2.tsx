@@ -139,7 +139,7 @@ const IncomingCallModal2 = ({ open, onOpenChange }: IncomingCallModal2Props) => 
           <div className="px-6 pb-6 pt-3 bg-card">
             <Button
               className="w-full rounded-2xl h-12 text-sm font-medium gap-2 bg-green-600 hover:bg-green-700"
-              onClick={() => { onOpenChange(false); navigate("/crm", { state: { customer: "pooja" } }); }}>
+              onClick={() => { onOpenChange(false); navigate("/crm2", { state: { customer: "pooja" } }); }}>
               <Phone className="h-4 w-4" />
               Answer Call
             </Button>

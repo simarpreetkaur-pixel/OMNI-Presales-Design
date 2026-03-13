@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import bgGradient from "@/assets/bg-gradient.png";
 import ackoFabIcon from "@/assets/acko-fab-icon.png";
-import OutgoingCallModal from "@/components/OutgoingCallModal";
-import IncomingCallModal from "@/components/IncomingCallModal";
+import callbackIllustration from "@/assets/callback-illustration.png";
 import OutgoingCallModal2 from "@/components/OutgoingCallModal2";
 import OutgoingCallModal3 from "@/components/OutgoingCallModal3";
 import IncomingCallModal2 from "@/components/IncomingCallModal2";
@@ -14,8 +13,6 @@ import IncomingCallModal2 from "@/components/IncomingCallModal2";
 const Index = () => {
   const location = useLocation();
   const [showCallOptions, setShowCallOptions] = useState(false);
-  const [showOutgoingCall, setShowOutgoingCall] = useState(false);
-  const [showIncomingCall, setShowIncomingCall] = useState(false);
   const [showOutgoingCall2, setShowOutgoingCall2] = useState(false);
   const [showOutgoingCall3, setShowOutgoingCall3] = useState(false);
   const [showIncomingCall2, setShowIncomingCall2] = useState(false);
@@ -47,26 +44,6 @@ const Index = () => {
           <span className="text-foreground tracking-tight text-lg font-medium">
             OMNI Pre-sales
           </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            onClick={() => setShowOutgoingCall(true)}
-            title="Outgoing call"
-          >
-            <PhoneOutgoing className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            onClick={() => setShowIncomingCall(true)}
-            title="Incoming call"
-          >
-            <PhoneIncoming className="h-4 w-4" />
-          </Button>
         </div>
       </header>
 
@@ -156,21 +133,24 @@ const Index = () => {
         </div>
       </main>
 
-      <OutgoingCallModal open={showOutgoingCall} onOpenChange={setShowOutgoingCall} />
-      <IncomingCallModal open={showIncomingCall} onOpenChange={setShowIncomingCall} />
       <OutgoingCallModal2 open={showOutgoingCall2} onOpenChange={setShowOutgoingCall2} />
       <OutgoingCallModal3 open={showOutgoingCall3} onOpenChange={setShowOutgoingCall3} />
       <IncomingCallModal2 open={showIncomingCall2} onOpenChange={setShowIncomingCall2} />
 
       <Dialog open={showCallbackConfirm} onOpenChange={setShowCallbackConfirm}>
-        <DialogContent className="sm:max-w-[360px] p-6 gap-5 rounded-[20px] border-border shadow-xl">
-          <DialogTitle className="text-base font-semibold text-foreground">
+        <DialogContent className="sm:max-w-[380px] p-8 gap-0 rounded-[24px] border-border shadow-xl text-center">
+          <DialogTitle className="sr-only">Call back confirmation</DialogTitle>
+          <img src={callbackIllustration} alt="" className="h-24 w-24 mx-auto mb-5" />
+          <p className="text-xl font-bold text-foreground mb-2">
             Are you sure you want to call back?
-          </DialogTitle>
-          <div className="flex items-center gap-3">
+          </p>
+          <p className="text-sm text-muted-foreground mb-6">
+            Use this only if the previous call ended unexpectedly.
+          </p>
+          <div className="flex gap-3">
             <Button
               variant="outline"
-              className="flex-1 rounded-xl"
+              className="flex-1 rounded-xl border-primary text-primary hover:text-primary hover:border-primary"
               onClick={() => setShowCallbackConfirm(false)}
             >
               Cancel

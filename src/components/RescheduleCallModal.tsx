@@ -318,28 +318,24 @@ const RescheduleCallModal = ({
                       </button>
                     ))}
                   </div>
-                  {/* Horizontally scrollable times with right fade */}
-                  <div className="relative">
-                    <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 pr-12">
-                      {displayedTimes.map((time) => (
-                        <Button
-                          key={time}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedExactTime(time)}
-                          className={cn(
-                            "shrink-0 px-4 py-2.5 rounded-xl",
-                            selectedExactTime === time
-                              ? "border-primary bg-secondary text-primary"
-                              : "border-border bg-card text-foreground hover:border-purple-400"
-                          )}
-                        >
-                          {time.replace(" AM", "").replace(" PM", "")}
-                        </Button>
-                      ))}
-                    </div>
-                    {/* Right fade overlay */}
-                    <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent" />
+                  {/* Wrapping time grid */}
+                  <div className="flex flex-wrap gap-2">
+                    {displayedTimes.map((time) => (
+                      <Button
+                        key={time}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedExactTime(time)}
+                        className={cn(
+                          "px-4 py-2.5 rounded-xl",
+                          selectedExactTime === time
+                            ? "border-primary bg-secondary text-primary"
+                            : "border-border bg-card text-foreground hover:border-purple-400"
+                        )}
+                      >
+                        {time.replace(" AM", "").replace(" PM", "")}
+                      </Button>
+                    ))}
                   </div>
                 </div>
               </div>

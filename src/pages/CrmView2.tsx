@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Send,
   Smartphone,
@@ -16,6 +16,9 @@ import {
   Phone,
   ChevronLeft,
   ChevronRight,
+  Headset,
+  Check,
+  Sparkles,
 } from "lucide-react";
 import aiIcon from "@/assets/ai-icon.png";
 import { Button } from "@/components/ui/button";
@@ -45,6 +48,7 @@ const aiSuggestions = [
 ];
 
 const phase1CTAs = ["Resume Quote", "Check Payment Status", "Network Hospitals"];
+const phase1PooJaCTAs = ["Compare Plans", "Check Nearby Hospitals", "Inclusions & Exclusions"];
 const phase2CTAs = ["Resume Quote", "Compare Plans", "Inclusions & Exclusions", "Check Payment Status"];
 
 const phase1QuickActions: QuickAction[] = [
@@ -128,6 +132,34 @@ const phase1SmartResponses: { keywords: string[]; response: string[] }[] = [
       "Bimal Auto – 1.2 km · Maruti authorised",
       "Kalyani Motors – 3.5 km · Multi-brand",
       "All cashless-enabled under ACKO network",
+    ],
+  },
+  {
+    keywords: ["engine protection", "engine cover"],
+    response: [
+      "ACKO Comprehensive covers engine damage caused by accidents.",
+      "For flood/water damage, the Engine Protection add-on (₹899/yr) is needed.",
+      "It covers hydrostatic lock and lubricant leakage from accident damage.",
+      "Strongly recommended for Bangalore given frequent waterlogging.",
+    ],
+  },
+  {
+    keywords: ["premium is high", "high premium", "too expensive", "costly"],
+    response: [
+      "Acknowledge: 'I understand ₹8,450 may seem high upfront.'",
+      "Reframe: It's only ₹23/day for full protection on a ₹6.25L car.",
+      "Highlight: Zero paperwork, 2-hr cashless settlement, 98.5% claim ratio.",
+      "Option: Base plan at ₹7,250/yr (without add-ons) if budget is tight.",
+    ],
+  },
+  {
+    keywords: ["add-ons", "add on", "addon", "what add-on", "suggest for this customer"],
+    response: [
+      "Recommended for Rajesh Kumar (Honda Amaze 2025, Bangalore):",
+      "Zero Depreciation – ₹1,200/yr · Full part value on claims (must-have for new car)",
+      "Engine Protection – ₹899/yr · Critical given Bangalore waterlogging risk",
+      "Roadside Assistance – ₹499/yr · 24/7 towing, battery jump, flat tyre",
+      "Return to Invoice – ₹750/yr · Full invoice value on total loss or theft",
     ],
   },
 ];
@@ -242,13 +274,20 @@ type ChatMessage = {
   component?: React.ReactNode;
 };
 
+
 const CrmView2 = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const customer = (location.state as { customer?: string } | null)?.customer;
+  const isPooja = customer === "pooja";
+  const isRajesh2 = customer === "rajesh2";
   const [phase, setPhase] = useState<"phase1" | "phase2">("phase1");
   const [inputValue, setInputValue] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [ctasVisible, setCtasVisible] = useState(true);
+  const [ctasVisible, setCtasVisible] = useState(false);
   const [isAiTyping, setIsAiTyping] = useState(false);
+  const [nudgeRead, setNudgeRead] = useState(false);
+  const [chipsHidden, setChipsHidden] = useState(false);
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [quoteBuilderOpen, setQuoteBuilderOpen] = useState(false);
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
@@ -273,10 +312,22 @@ const CrmView2 = () => {
 
   useEffect(() => {
     setChatMessages([]);
-    setCtasVisible(true);
+    setCtasVisible(false);
     setIsAiTyping(false);
     setInputValue("");
+    setChipsHidden(false);
   }, [phase]);
+
+  // Staggered Phase I opening sections
+  useEffect(() => {
+    if (phase !== "phase1") {
+      setCtasVisible(true);
+      return;
+    }
+    setCtasVisible(false);
+    const t = setTimeout(() => setCtasVisible(true), 500);
+    return () => clearTimeout(t);
+  }, [phase, isPooja]);
 
   const handleQuickAction = (label: string) => {
     setQuickActionsOpen(false);
@@ -289,7 +340,7 @@ const CrmView2 = () => {
   };
 
   const handleCtaSelect = (cta: string) => {
-    if (cta === "Lead-360" || cta === "Network Hospitals") {
+    if (cta === "Lead-360" || cta === "Network Hospitals" || cta === "Check Nearby Hospitals") {
       window.open("/lead-360", "_blank");
       return;
     }
@@ -318,6 +369,8 @@ const CrmView2 = () => {
       setTimeout(() => {
         if (cta === "Compare Plans") {
           setChatMessages((prev) => [...prev, { role: "ai", content: [], component: <PlanComparison /> }]);
+        } else if (cta === "Inclusions & Exclusions") {
+          setChatMessages((prev) => [...prev, { role: "ai", content: [], component: <InclusionsExclusionsWidget /> }]);
         } else {
           const response = phase1CtaResponses[cta] || getSmartResponse(cta, "phase1");
           setChatMessages((prev) => [...prev, { role: "ai", content: response }]);
@@ -451,7 +504,7 @@ const CrmView2 = () => {
       <div className={cn(
         "flex-1 grid overflow-hidden transition-all duration-300 relative",
         phase === "phase1"
-          ? "grid-cols-[320px_1fr_260px]"
+          ? "grid-cols-[328px_1fr_260px]"
           : quoteBuilderOpen
             ? leftPaneCollapsed
               ? "grid-cols-[0px_1fr_420px]"
@@ -462,23 +515,42 @@ const CrmView2 = () => {
       )}>
         {/* Left Pane -- Customer Data */}
         <aside className="relative bg-card shadow-[2px_0_12px_rgba(0,0,0,0.06)] z-10 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
             {/* Container 1: Customer Details */}
             <div className="rounded-xl border border-onyx-300 p-4 space-y-3">
               <p className="text-xs font-semibold tracking-wide text-[#5B5675] uppercase">
                 Customer Details
               </p>
-              <div className="space-y-2.5">
+              <div className="h-px bg-border" />
+              <div className="space-y-3">
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-sm text-muted-foreground shrink-0">Name</span>
-                  <span className="text-sm font-semibold text-foreground text-right">
-                    Rajesh Kumar
+                  <span className="text-sm font-normal shrink-0" style={{ color: "#5B5675" }}>Name</span>
+                  <span className="text-sm font-medium text-right" style={{ color: "#36354C" }}>
+                    {isPooja ? "Pooja Arora" : "Rajesh Kumar"}
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-sm text-muted-foreground shrink-0">Language</span>
-                  <span className="text-sm font-semibold text-foreground text-right">
+                  <span className="text-sm font-normal shrink-0" style={{ color: "#5B5675" }}>Language</span>
+                  <span className="text-sm font-medium text-right" style={{ color: "#36354C" }}>
                     Hindi
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-sm font-normal shrink-0" style={{ color: "#5B5675" }}>State</span>
+                  <span className="text-sm font-medium text-right" style={{ color: "#36354C" }}>
+                    {isPooja ? "Delhi" : "Karnataka"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-normal shrink-0" style={{ color: "#5B5675" }}>Customer type</span>
+                  <span className={cn(
+                    "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold",
+                    isPooja
+                      ? "bg-blue-50 text-blue-700 border border-blue-200"
+                      : "bg-green-50 text-green-700 border border-green-200"
+                  )}>
+                    <span className={cn("h-1.5 w-1.5 rounded-full", isPooja ? "bg-blue-500" : "bg-green-500")} />
+                    {isPooja ? "New" : "Existing"}
                   </span>
                 </div>
               </div>
@@ -489,32 +561,29 @@ const CrmView2 = () => {
               <p className="text-xs font-semibold tracking-wide text-[#5B5675] uppercase">
                 Call Context
               </p>
-              <div className="space-y-2.5">
+              <div className="h-px bg-border" />
+              <div className="space-y-3">
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-sm text-muted-foreground shrink-0">Interested in</span>
-                  <span className="text-sm font-semibold text-foreground text-right">
-                    Car_Comprehensive
+                  <span className="text-sm font-normal shrink-0" style={{ color: "#5B5675" }}>Interested in</span>
+                  <span className="text-sm font-medium text-right" style={{ color: "#36354C" }}>
+                    {isPooja ? "Health Insurance" : "Car_Comprehensive"}
                   </span>
                 </div>
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-sm text-muted-foreground shrink-0">Vehicle type</span>
-                  <span className="text-sm font-semibold text-foreground text-right break-words min-w-0">
-                    Honda Amaze 2025
-                  </span>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm text-muted-foreground shrink-0">Last Activity</span>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-purple-300 bg-purple-50 px-2 py-[2px]">
-                    <Smartphone className="h-4 w-4 text-primary" />
-                    <span className="text-[14px] font-medium text-primary">Mobile App</span>
-                  </span>
-                </div>
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-sm text-muted-foreground shrink-0">Dropped-off at</span>
-                  <span className="text-sm font-semibold text-foreground text-right">
-                    Payment page
-                  </span>
-                </div>
+                {isPooja ? (
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm font-normal shrink-0" style={{ color: "#5B5675" }}>Plan</span>
+                    <span className="text-sm font-medium text-right break-words min-w-0" style={{ color: "#36354C" }}>
+                      ACKO Platinum Lite
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm font-normal shrink-0" style={{ color: "#5B5675" }}>Vehicle</span>
+                    <span className="text-sm font-medium text-right break-words min-w-0" style={{ color: "#36354C" }}>
+                      Honda Amaze 2025
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -538,15 +607,16 @@ const CrmView2 = () => {
                   Create New
                 </button>
               </div>
-              <div className="rounded-lg bg-onyx-200 p-4 space-y-1 text-[#EFE9FB]">
+              <div className="h-px bg-border" />
+              <div className="rounded-lg p-4 space-y-1" style={{ backgroundColor: "rgba(239, 233, 251, 0.6)" }}>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-semibold text-foreground truncate">
-                    Zero Dep Plan
+                  <span className="text-base font-medium truncate" style={{ color: "#36354C" }}>
+                    {isPooja ? "Platinum Lite Plan" : "Zero Dep Plan"}
                   </span>
-                  <span className="text-xs text-muted-foreground shrink-0">Feb 10 2026</span>
+                  <span className="text-xs text-muted-foreground shrink-0">{isPooja ? "Feb 07 2026" : "Feb 10 2026"}</span>
                 </div>
-                <p className="text-xs text-muted-foreground truncate">
-                  Ecosport Titanium 2025
+                <p className="text-sm text-muted-foreground truncate">
+                  {isPooja ? "Family Floater · 10L Cover" : "Honda Amaze 2025"}
                 </p>
                 <button
                   onClick={() => phase === "phase2" ? setQuoteBuilderOpen(true) : window.open("/lead-360", "_blank")}
@@ -582,27 +652,93 @@ const CrmView2 = () => {
         <main className="flex-1 flex flex-col bg-muted overflow-hidden">
           <ScrollArea className="flex-1 px-6 py-6" ref={scrollRef}>
             <div className="space-y-6">
-              {/* AI Suggestions Bubble */}
-              <div className="flex items-start gap-3">
-                <div className="h-8 w-8 rounded-full shrink-0 mt-1 overflow-hidden">
-                  <img src={aiIcon} alt="AI" className="h-full w-full object-cover" />
-                </div>
-                <div className="flex-1 bg-card border border-border rounded-2xl p-5 shadow-sm">
-                  <p className="text-sm font-semibold text-foreground mb-2">
-                    Agent's next best action:
-                  </p>
-                  <div className="space-y-2">
-                    {aiSuggestions.map((suggestion, index) => (
-                      <div key={index} className="flex items-start gap-2.5">
-                        <span className="text-muted-foreground mt-1.5 text-[6px]">●</span>
-                        <p className="text-base text-foreground leading-relaxed">
-                          {suggestion}
-                        </p>
-                      </div>
-                    ))}
+
+              {/* Phase II: Agent's next best action */}
+              {phase === "phase2" && (
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full shrink-0 mt-1 overflow-hidden">
+                    <img src={aiIcon} alt="AI" className="h-full w-full object-cover" />
+                  </div>
+                  <div className="flex-1 bg-card border border-border rounded-2xl p-5 shadow-sm">
+                    <p className="text-sm font-semibold text-foreground mb-2">
+                      Agent&apos;s next best action:
+                    </p>
+                    <div className="space-y-2">
+                      {aiSuggestions.map((suggestion, index) => (
+                        <div key={index} className="flex items-start gap-2.5">
+                          <span className="text-muted-foreground mt-1.5 text-[6px]">●</span>
+                          <p className="text-base text-foreground leading-relaxed">
+                            {suggestion}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Phase I: Nudge card (always visible until marked as read) */}
+              {phase === "phase1" && !nudgeRead && (
+                <div
+                  className="rounded-2xl p-[1px] shrink-0"
+                  style={{
+                    background: "linear-gradient(to right, rgba(9,48,101,0.6), rgba(19,105,235,0.6), rgba(250,197,21,0.6), rgba(134,203,60,0.6))",
+                  }}
+                >
+                  <div className="bg-white rounded-2xl p-4 space-y-3">
+                    {/* Header row */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-foreground">
+                        {isPooja ? "AI Summary:" : "Conversation cues:"}
+                      </span>
+                      <button
+                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={() => setNudgeRead(true)}
+                      >
+                        <Check className="h-3 w-3" />
+                        MARK AS READ
+                      </button>
+                    </div>
+                    {/* Cue pills — Rajesh (original) and Rajesh 2 only */}
+                    {!isPooja && (
+                      <div className="flex flex-wrap gap-2">
+                        {["ACKO customer since 4 years", "Bike Policy currently active"].map((cue) => (
+                          <span
+                            key={cue}
+                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border"
+                            style={{ backgroundColor: "#F0FDF4", borderColor: "#BBF7D0", color: "#15803D" }}
+                          >
+                            {cue}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {/* AI Summary — Rajesh 2 and Pooja only */}
+                    {(isRajesh2 || isPooja) && (
+                      <div className="pt-0.5 space-y-1.5">
+                        {!isPooja && (
+                          <div className="flex items-center gap-1.5">
+                            <Sparkles className="h-3.5 w-3.5 text-primary" />
+                            <span className="text-sm font-medium text-foreground">AI Summary:</span>
+                          </div>
+                        )}
+                        {(isPooja ? [
+                          "Customer asked for comparison between HDFC Ergo and Platinum Lite",
+                          "Mentioned to discuss with Husband and make decision.",
+                        ] : [
+                          "Discussed RSA and Zero Dep",
+                          "Will discuss with wife and finalise",
+                        ]).map((point, i) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <span className="mt-1.5 text-[5px] shrink-0" style={{ color: "#5B5675" }}>●</span>
+                            <p className="text-sm font-normal leading-relaxed" style={{ color: "#5B5675" }}>{point}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Chat Messages */}
               {chatMessages.map((msg, idx) => (
@@ -629,7 +765,7 @@ const CrmView2 = () => {
                   ) : (
                     <div
                       className={cn(
-                        "rounded-2xl p-4 shadow-sm max-w-[75%] animate-cta-fade-in",
+                        "rounded-2xl px-4 py-[14px] shadow-sm max-w-[75%] animate-cta-fade-in",
                         msg.role === "agent"
                           ? "bg-primary text-primary-foreground"
                           : "bg-card border border-border"
@@ -654,7 +790,7 @@ const CrmView2 = () => {
               ))}
 
               {/* Predictive CTAs */}
-              {ctasVisible && (
+              {phase === "phase2" && ctasVisible && (
                 <div className="flex items-start gap-3">
                   <div className="h-8 w-8 rounded-full shrink-0 mt-1 overflow-hidden">
                     <img
@@ -664,7 +800,7 @@ const CrmView2 = () => {
                     />
                   </div>
                   <PredictiveCTABar
-                    ctas={phase === "phase1" ? phase1CTAs : phase2CTAs}
+                    ctas={phase === "phase1" ? (isPooja ? phase1PooJaCTAs : phase1CTAs) : phase2CTAs}
                     onSelect={handleCtaSelect}
                   />
                 </div>
@@ -703,7 +839,7 @@ const CrmView2 = () => {
 
           {/* Sticky Input Bar */}
           <div className="px-6 py-4 bg-muted">
-            <div className="max-w-2xl mx-auto relative">
+            <div className="max-w-2xl mx-auto">
               {phase === "phase2" && (
                 <QuickActionsDrawer
                   actions={phase2QuickActions}
@@ -712,30 +848,69 @@ const CrmView2 = () => {
                   visible={quickActionsOpen}
                 />
               )}
-              <Input
-                placeholder={phase === "phase1" ? "Ask a question" : "Ask a question or pick an option"}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setQuickActionsOpen(false);
-                    handleSendMessage();
-                  }
-                }}
-                onFocus={() => { if (phase === "phase2") setQuickActionsOpen(true); }}
-                onBlur={() => {
-                  if (phase === "phase2") setTimeout(() => setQuickActionsOpen(false), 150);
-                }}
-                className="pr-12 bg-card rounded-xl border-onyx-300 shadow-sm"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleSendMessage}
-                className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent active:scale-100"
-              >
-                <Send className="h-5 w-5" />
-              </Button>
+              {phase === "phase1" && !isPooja && !chipsHidden && (
+                <div className="flex gap-2 mb-2 flex-wrap">
+                  {[
+                    { label: "Engine protection", fill: "Does ACKO car comprehensive cover engine protection?" },
+                    { label: "High Premium",      fill: "Customer saying premium is high, what to say?" },
+                    { label: "Add-ons",           fill: "What add-ons can I suggest for this customer?" },
+                  ].map(({ label, fill }) => (
+                    <button
+                      key={label}
+                      onClick={() => { setInputValue(fill); setChipsHidden(true); }}
+                      className="px-3 py-1.5 text-sm font-normal border bg-white hover:bg-purple-50 transition-colors"
+                      style={{ borderColor: "#D0BDF4", color: "#5920C5", borderRadius: "18px" }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {phase === "phase1" && isPooja && !chipsHidden && (
+                <div className="flex gap-2 mb-2 flex-wrap">
+                  {[
+                    { label: "Pre-existing disease", fill: "Does ACKO health plan cover pre-existing diseases?" },
+                    { label: "High premium",         fill: "Customer saying premium is high, what to say?" },
+                    { label: "Add-on",               fill: "What add-ons can I suggest for this health plan?" },
+                  ].map(({ label, fill }) => (
+                    <button
+                      key={label}
+                      onClick={() => { setInputValue(fill); setChipsHidden(true); }}
+                      className="px-3 py-1.5 text-sm font-normal border bg-white hover:bg-purple-50 transition-colors"
+                      style={{ borderColor: "#D0BDF4", color: "#5920C5", borderRadius: "18px" }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="relative">
+                <Input
+                  placeholder="Ask any question..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      setQuickActionsOpen(false);
+                      handleSendMessage();
+                    }
+                  }}
+                  onFocus={() => { if (phase === "phase2") setQuickActionsOpen(true); }}
+                  onBlur={() => {
+                    if (phase === "phase2") setTimeout(() => setQuickActionsOpen(false), 150);
+                  }}
+                  className="pr-12 rounded-xl text-sm placeholder:text-sm shadow-sm"
+                  style={{ backgroundColor: "#FFFFFF", borderColor: "#E7E7F0" }}
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleSendMessage}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent active:scale-100"
+                >
+                  <Send className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
           </div>
         </main>
@@ -799,8 +974,13 @@ const CrmView2 = () => {
             setTimeout(() => {
               toast(
                 <div className="flex items-stretch gap-0">
+                  <div className="flex items-center pr-4 shrink-0">
+                    <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+                      <Check className="h-4 w-4 text-white" />
+                    </div>
+                  </div>
                   <p className="text-sm flex-1 pr-4">
-                    Call with <span className="font-semibold">Rajesh Kumar</span> has ended. Disposition will be done automatically.
+                    Call with <span className="font-semibold">{isPooja ? "Pooja Arora" : "Rajesh Kumar"}</span> has ended. Disposition will be done automatically.
                   </p>
                   <div className="w-px bg-border shrink-0" />
                   <div className="flex flex-col shrink-0 pl-4">

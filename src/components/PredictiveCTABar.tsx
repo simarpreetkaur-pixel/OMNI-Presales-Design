@@ -15,10 +15,9 @@ const PredictiveCTABar = ({ ctas, onSelect, visible = true }: PredictiveCTABarPr
         <Button
           key={cta}
           variant="outline"
-          size="sm"
           onClick={() => onSelect(cta)}
-          className="bg-white text-purple-600 text-base shadow-[inset_0_0_0_1.5px_hsl(var(--purple-400))] hover:bg-purple-50 hover:shadow-[inset_0_0_0_1.5px_hsl(var(--purple-500))] hover:text-purple-700 rounded-xl animate-cta-fade-in opacity-0 [animation-fill-mode:forwards]"
-          style={{ animationDelay: `${index * 50}ms` }}
+          className="bg-white text-base font-normal rounded-xl animate-cta-fade-in opacity-0 [animation-fill-mode:forwards] hover:bg-purple-50 py-2 px-3 h-auto border-[#5920C5] text-[#5920C5] hover:text-[#5920C5] hover:border-[#5920C5]"
+          style={{ animationDelay: `${index * 50}ms`, borderColor: "#5920C5" }}
         >
           {cta}
         </Button>

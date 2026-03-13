@@ -144,7 +144,7 @@ const OutgoingCallModal3 = ({ open, onOpenChange }: OutgoingCallModal3Props) => 
             <Button
               className="rounded-2xl h-12 flex-1 text-sm font-medium"
               disabled={!isConnected}
-              onClick={() => { onOpenChange(false); navigate("/crm2"); }}>
+              onClick={() => { onOpenChange(false); navigate("/crm2", { state: { customer: "rajesh2" } }); }}>
               Continue
             </Button>
           </div>
