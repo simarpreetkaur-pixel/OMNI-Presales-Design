@@ -680,9 +680,9 @@ const CrmView2 = () => {
               {/* Phase I: Nudge card (always visible until marked as read) */}
               {phase === "phase1" && !nudgeRead && (
                 <div
-                  className="rounded-2xl p-[1px] shrink-0"
+                  className="rounded-2xl p-[2px] shrink-0"
                   style={{
-                    background: "linear-gradient(to right, rgba(9,48,101,0.6), rgba(19,105,235,0.6), rgba(250,197,21,0.6), rgba(134,203,60,0.6))",
+                    background: "linear-gradient(to right, rgba(9,48,101,0.6) 0%, rgba(19,105,235,0.6) 27.5%, rgba(250,197,21,0.6) 60%, rgba(134,203,60,0.6) 100%)",
                   }}
                 >
                   <div className="bg-white rounded-2xl p-4 space-y-3">
