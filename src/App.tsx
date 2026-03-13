@@ -16,7 +16,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter basename="/OMNI-Presales-Design">
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/crm" element={<CrmView />} />
