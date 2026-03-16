@@ -13,7 +13,6 @@ import {
   Stethoscope,
   CalendarDays,
   Clock,
-  Phone,
   ChevronLeft,
   ChevronRight,
   Headset,
@@ -41,6 +40,8 @@ import InclusionsExclusionsWidget from "@/components/InclusionsExclusionsWidget"
 import QuickActionsDrawer, { type QuickAction } from "@/components/QuickActionsDrawer";
 import QuoteBuilder from "@/components/QuoteBuilder";
 import RescheduleCallModal from "@/components/RescheduleCallModal";
+import OzontelPanel from "@/components/OzontelPanel";
+import ackoFabIcon from "@/assets/acko-fab-icon.png";
 
 const aiSuggestions = [
   "Understand the customer's request with clarity",
@@ -287,11 +288,11 @@ const CrmView2 = () => {
   const [ctasVisible, setCtasVisible] = useState(false);
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [nudgeRead, setNudgeRead] = useState(false);
-  const [chipsHidden, setChipsHidden] = useState(false);
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [quoteBuilderOpen, setQuoteBuilderOpen] = useState(false);
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
+  const [ozontelOpen, setOzontelOpen] = useState(false);
   const [scheduledTime, setScheduledTime] = useState<{ date: string; time: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -315,7 +316,6 @@ const CrmView2 = () => {
     setCtasVisible(false);
     setIsAiTyping(false);
     setInputValue("");
-    setChipsHidden(false);
   }, [phase]);
 
   // Staggered Phase I opening sections
@@ -848,42 +848,6 @@ const CrmView2 = () => {
                   visible={quickActionsOpen}
                 />
               )}
-              {phase === "phase1" && !isPooja && !chipsHidden && (
-                <div className="flex gap-2 mb-2 flex-wrap">
-                  {[
-                    { label: "Engine protection", fill: "Does ACKO car comprehensive cover engine protection?" },
-                    { label: "High Premium",      fill: "Customer saying premium is high, what to say?" },
-                    { label: "Add-ons",           fill: "What add-ons can I suggest for this customer?" },
-                  ].map(({ label, fill }) => (
-                    <button
-                      key={label}
-                      onClick={() => { setInputValue(fill); setChipsHidden(true); }}
-                      className="px-3 py-1.5 text-sm font-normal border bg-white hover:bg-purple-50 transition-colors"
-                      style={{ borderColor: "#D0BDF4", color: "#5920C5", borderRadius: "18px" }}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {phase === "phase1" && isPooja && !chipsHidden && (
-                <div className="flex gap-2 mb-2 flex-wrap">
-                  {[
-                    { label: "Pre-existing disease", fill: "Does ACKO health plan cover pre-existing diseases?" },
-                    { label: "High premium",         fill: "Customer saying premium is high, what to say?" },
-                    { label: "Add-on",               fill: "What add-ons can I suggest for this health plan?" },
-                  ].map(({ label, fill }) => (
-                    <button
-                      key={label}
-                      onClick={() => { setInputValue(fill); setChipsHidden(true); }}
-                      className="px-3 py-1.5 text-sm font-normal border bg-white hover:bg-purple-50 transition-colors"
-                      style={{ borderColor: "#D0BDF4", color: "#5920C5", borderRadius: "18px" }}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
               <div className="relative">
                 <Input
                   placeholder="Ask any question..."
@@ -960,16 +924,24 @@ const CrmView2 = () => {
         <Button
           variant="outline"
           size="icon"
-          className="rounded-full shadow-lg h-14 w-14 border border-onyx-300"
+          className="rounded-2xl shadow-lg h-14 w-14 border border-onyx-300"
           onClick={() => setRescheduleOpen(true)}
         >
           <CalendarDays className="h-5 w-5" />
         </Button>
-        <Button
-          variant="destructive"
-          size="icon"
-          className="rounded-full shadow-lg h-14 w-14 border border-onyx-300"
-          onClick={() => {
+        <button
+          className="h-14 w-14 rounded-2xl shadow-lg p-0 overflow-hidden"
+          onClick={() => setOzontelOpen((prev) => !prev)}
+        >
+          <img src={ackoFabIcon} alt="Ozontel" className="h-full w-full rounded-2xl" />
+        </button>
+      </div>
+
+      {ozontelOpen && (
+        <OzontelPanel
+          customer={isPooja ? "pooja" : isRajesh2 ? "rajesh2" : "rajesh"}
+          onEndCall={() => {
+            setOzontelOpen(false);
             navigate("/");
             setTimeout(() => {
               toast(
@@ -1003,10 +975,8 @@ const CrmView2 = () => {
               );
             }, 100);
           }}
-        >
-          <Phone className="h-5 w-5" />
-        </Button>
-      </div>
+        />
+      )}
 
       <RescheduleCallModal
         open={rescheduleOpen}
