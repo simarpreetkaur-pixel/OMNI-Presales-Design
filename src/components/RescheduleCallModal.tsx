@@ -5,6 +5,10 @@ import { CalendarDays, ArrowLeft, X, Sunrise, Sun, Sunset, ChevronDown, ChevronU
 import { Separator } from "@/components/ui/separator";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -54,6 +58,9 @@ const RescheduleCallModal = ({
   const [exactTimeOpen, setExactTimeOpen] = useState(false);
   const [selectedExactTime, setSelectedExactTime] = useState<string | null>(null);
   const [amPm, setAmPm] = useState<"AM" | "PM">("AM");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
+  const [exactTimeCollapsed, setExactTimeCollapsed] = useState(true);
+  const [customDateOpen, setCustomDateOpen] = useState(false);
 
   const today = new Date();
 
@@ -105,6 +112,7 @@ const RescheduleCallModal = ({
     setSelectedTime(slot);
     setSelectedExactTime(null);
     setExactTimeOpen(false);
+    setExactTimeCollapsed(true);
   };
 
   const displayedTimes = amPm === "AM" ? amTimes : pmTimes;
@@ -149,6 +157,7 @@ const RescheduleCallModal = ({
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden rounded-[20px] border-border shadow-xl [&>button:last-child]:hidden">
         <DialogTitle className="sr-only">Reschedule Call</DialogTitle>
@@ -190,9 +199,7 @@ const RescheduleCallModal = ({
         <div className="px-6 py-6 space-y-6 bg-white">
           {/* Select Date */}
           <div className="space-y-3">
-            <p className="text-xs font-semibold tracking-wider uppercase text-onyx-500" style={{ letterSpacing: '0.5px' }}>
-              Select date
-            </p>
+            <p className="text-sm font-medium text-foreground">Select Date</p>
             <div className="flex gap-2">
               {(["today", "tomorrow", "dayAfter"] as DateOption[]).map((option) => (
                 <Button
@@ -210,137 +217,138 @@ const RescheduleCallModal = ({
                   {option === "today" ? "Today" : option === "tomorrow" ? "Tomorrow" : "Day After"}
                 </Button>
               ))}
-              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedDate("pick")}
-                    className={cn(
-                      "px-4 py-2.5 rounded-xl gap-2",
-                      selectedDate === "pick"
-                        ? "border-primary bg-secondary text-primary"
-                        : "border-border bg-card text-foreground hover:border-purple-400"
-                    )}
-                  >
-                    <CalendarDays className="h-4 w-4" />
-                    {getPickButtonLabel()}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={pickedDate}
-                    onSelect={(date) => {
-                      setPickedDate(date);
-                      setSelectedDate("pick");
-                      setCalendarOpen(false);
-                      setSelectedExactTime(null);
-                    }}
-                    disabled={(date) => date < today}
-                    initialFocus
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCustomDateOpen(true)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2.5 rounded-xl",
+                  selectedDate === "pick"
+                    ? "border-primary bg-secondary text-primary"
+                    : "border-border hover:border-purple-400"
+                )}
+              >
+                <CalendarDays className="h-4 w-4" />
+                <span className="text-sm font-medium">Custom</span>
+              </Button>
             </div>
           </div>
 
-          {/* Preferred Slot */}
+          {/* Preferred Slot - Bento Box Style */}
           <div className="space-y-3">
-            <p className="text-xs font-semibold tracking-wider uppercase text-onyx-500" style={{ letterSpacing: '0.5px' }}>
-              Preferred slot
-            </p>
+            <p className="text-sm font-medium text-foreground">Preferred Slot</p>
             <div className="grid grid-cols-3 gap-3">
               {timeSlots.map((slot) => (
-                <Button
+                <Card
                   key={slot.key}
-                  variant="outline"
-                  onClick={() => handleSlotSelect(slot.key)}
                   className={cn(
-                    "flex flex-col items-start gap-3 p-4 h-auto rounded-2xl",
+                    "cursor-pointer transition-all hover:shadow-md",
                     selectedTime === slot.key
-                      ? "border-primary bg-secondary shadow-sm"
-                      : "border-border bg-card hover:border-purple-400"
+                      ? "border-primary bg-secondary"
+                      : "border-border hover:border-purple-400"
                   )}
+                  onClick={() => handleSlotSelect(slot.key)}
                 >
-                  <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center", slot.iconBg)}>
-                    {slot.icon}
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-onyx-800">
-                      {slot.label}
-                    </p>
-                    <p className="text-xs mt-0.5 text-onyx-500">
-                      {slot.time}
-                    </p>
-                  </div>
-                </Button>
+                  <CardContent className="p-4 text-center space-y-2">
+                    <div className={cn("w-10 h-10 rounded-lg mx-auto flex items-center justify-center", slot.iconBg)}>
+                      {slot.icon}
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{slot.label}</p>
+                      <p className="text-xs text-muted-foreground">{slot.time}</p>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
 
-          {/* Select Exact Time */}
-          <div className="space-y-3">
-            <Button
-              variant="outline"
-              onClick={() => setExactTimeOpen((prev) => !prev)}
-              className="w-full flex items-center justify-between px-5 py-4 h-auto rounded-2xl border-border bg-card hover:border-purple-400"
-            >
-              <p className="text-xs font-semibold tracking-wider uppercase text-onyx-500" style={{ letterSpacing: '0.5px' }}>
-                Select exact time
-              </p>
-              {exactTimeOpen
-                ? <ChevronUp className="h-5 w-5 text-onyx-500" />
-                : <ChevronDown className="h-5 w-5 text-onyx-500" />
-              }
-            </Button>
-            <div className={cn(
-              "grid transition-all duration-300 ease-in-out",
-              exactTimeOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-            )}>
-              <div className="overflow-hidden">
-                <div className="pt-1 space-y-3">
-                  {/* AM / PM toggle */}
-                  <div className="flex items-center gap-1 bg-muted rounded-lg p-1 w-fit">
-                    {(["AM", "PM"] as const).map((period) => (
-                      <button
-                        key={period}
-                        onClick={() => { setAmPm(period); setSelectedExactTime(null); }}
-                        className={cn(
-                          "px-3 py-1 text-sm font-semibold rounded-md transition-colors",
-                          amPm === period
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        {period}
-                      </button>
-                    ))}
-                  </div>
-                  {/* Wrapping time grid */}
-                  <div className="flex flex-wrap gap-2">
-                    {displayedTimes.map((time) => (
+          {/* Select Exact Time - Collapsible */}
+          <Collapsible open={!exactTimeCollapsed} onOpenChange={() => setExactTimeCollapsed(!exactTimeCollapsed)}>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-between px-4 py-3 h-auto rounded-xl border-border hover:border-purple-400"
+              >
+                <span className="text-sm font-medium text-foreground">Select Exact Time</span>
+                <ChevronDown className={cn("h-4 w-4 transition-transform", !exactTimeCollapsed && "rotate-180")} />
+              </Button>
+            </CollapsibleTrigger>
+            
+            <CollapsibleContent className="space-y-4 mt-3">
+              <Tabs defaultValue="AM" onValueChange={(value) => {
+                setAmPm(value as "AM" | "PM");
+                setSelectedExactTime(null);
+              }}>
+                <TabsList className="grid w-fit grid-cols-2">
+                  <TabsTrigger value="AM">AM</TabsTrigger>
+                  <TabsTrigger value="PM">PM</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="AM" className="mt-3">
+                  <div className="grid grid-cols-4 gap-2">
+                    {amTimes.map((time) => (
                       <Button
                         key={time}
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedExactTime(time)}
                         className={cn(
-                          "px-4 py-2.5 rounded-xl",
+                          "text-sm",
                           selectedExactTime === time
                             ? "border-primary bg-secondary text-primary"
-                            : "border-border bg-card text-foreground hover:border-purple-400"
+                            : "border-border hover:border-purple-400"
                         )}
                       >
-                        {time.replace(" AM", "").replace(" PM", "")}
+                        {time.replace(" AM", "")}
                       </Button>
                     ))}
                   </div>
-                </div>
-              </div>
-            </div>
+                </TabsContent>
+                
+                <TabsContent value="PM" className="mt-3">
+                  <div className="grid grid-cols-4 gap-2">
+                    {pmTimes.map((time) => (
+                      <Button
+                        key={time}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedExactTime(time)}
+                        className={cn(
+                          "text-sm",
+                          selectedExactTime === time
+                            ? "border-primary bg-secondary text-primary"
+                            : "border-border hover:border-purple-400"
+                        )}
+                      >
+                        {time.replace(" PM", "")}
+                      </Button>
+                    ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Customer's Preferred Language */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Customer's preferred language <span className="text-muted-foreground">(Optional)</span>
+            </label>
+            <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select from options" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hindi">Hindi</SelectItem>
+                <SelectItem value="english">English</SelectItem>
+                <SelectItem value="malayalam">Malayalam</SelectItem>
+                <SelectItem value="kannada">Kannada</SelectItem>
+                <SelectItem value="telugu">Telugu</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+
         </div>
 
         {/* Summary + CTA */}
@@ -362,6 +370,59 @@ const RescheduleCallModal = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Custom Date Picker Modal */}
+    {customDateOpen && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Select date</h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCustomDateOpen(false)}
+              className="h-8 w-8"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <Calendar
+            mode="single"
+            selected={pickedDate}
+            onSelect={setPickedDate}
+            className="rounded-md border"
+            classNames={{
+              months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+              month: "space-y-4",
+              caption: "flex justify-center pt-1 relative items-center",
+              caption_label: "text-sm font-medium",
+              nav: "space-x-1 flex items-center",
+              nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+              table: "w-full border-collapse space-y-1",
+              head_row: "flex",
+              head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+              row: "flex w-full mt-2",
+              cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+              day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md",
+              day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+            }}
+          />
+          
+          <Button
+            onClick={() => {
+              setSelectedDate("pick");
+              setCustomDateOpen(false);
+            }}
+            className="w-full mt-4"
+            disabled={!pickedDate}
+          >
+            Confirm
+          </Button>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 
