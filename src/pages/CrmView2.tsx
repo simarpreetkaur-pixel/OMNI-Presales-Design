@@ -772,17 +772,23 @@ const CrmView2 = () => {
                       )}
                     >
                       <div className="space-y-2">
-                        {msg.content.map((line, i) => (
-                          <p
-                            key={i}
-                            className={cn(
-                              "text-base leading-relaxed",
-                              msg.role === "ai" && "text-foreground"
-                            )}
-                          >
-                            {line}
+                        {msg.content.length === 1 ? (
+                          <p className={cn(
+                            "text-base leading-relaxed",
+                            msg.role === "ai" && "text-foreground"
+                          )}>
+                            {msg.content[0]}
                           </p>
-                        ))}
+                        ) : (
+                          <ul className={cn(
+                            "space-y-1 text-base leading-relaxed list-disc list-inside",
+                            msg.role === "ai" && "text-foreground"
+                          )}>
+                            {msg.content.map((line, i) => (
+                              <li key={i}>{line}</li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     </div>
                   )}
