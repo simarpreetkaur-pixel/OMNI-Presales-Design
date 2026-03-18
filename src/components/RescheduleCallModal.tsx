@@ -270,63 +270,65 @@ const RescheduleCallModal = ({
                 variant="outline"
                 className="w-full flex items-center justify-between px-4 py-3 h-auto rounded-xl border-border hover:border-purple-400"
               >
-                <span className="text-sm font-medium text-foreground">Select Exact Time</span>
+                <span className="text-base font-medium text-foreground">Select Exact Time</span>
                 <ChevronDown className={cn("h-4 w-4 transition-transform", !exactTimeCollapsed && "rotate-180")} />
               </Button>
             </CollapsibleTrigger>
             
-            <CollapsibleContent className="space-y-4 mt-3">
-              <Tabs defaultValue="AM" onValueChange={(value) => {
-                setAmPm(value as "AM" | "PM");
-                setSelectedExactTime(null);
-              }}>
-                <TabsList className="grid w-fit grid-cols-2">
-                  <TabsTrigger value="AM">AM</TabsTrigger>
-                  <TabsTrigger value="PM">PM</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="AM" className="mt-3">
-                  <div className="grid grid-cols-4 gap-2">
-                    {amTimes.map((time) => (
-                      <Button
-                        key={time}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedExactTime(time)}
-                        className={cn(
-                          "text-sm",
-                          selectedExactTime === time
-                            ? "border-primary bg-secondary text-primary"
-                            : "border-border hover:border-purple-400"
-                        )}
-                      >
-                        {time.replace(" AM", "")}
-                      </Button>
-                    ))}
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="PM" className="mt-3">
-                  <div className="grid grid-cols-4 gap-2">
-                    {pmTimes.map((time) => (
-                      <Button
-                        key={time}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedExactTime(time)}
-                        className={cn(
-                          "text-sm",
-                          selectedExactTime === time
-                            ? "border-primary bg-secondary text-primary"
-                            : "border-border hover:border-purple-400"
-                        )}
-                      >
-                        {time.replace(" PM", "")}
-                      </Button>
-                    ))}
-                  </div>
-                </TabsContent>
-              </Tabs>
+            <CollapsibleContent className="mt-3">
+              <div className="p-4 rounded-xl border" style={{ backgroundColor: '#EFE9FB', borderColor: '#B191ED' }}>
+                <Tabs defaultValue="AM" onValueChange={(value) => {
+                  setAmPm(value as "AM" | "PM");
+                  setSelectedExactTime(null);
+                }}>
+                  <TabsList className="grid w-fit grid-cols-2">
+                    <TabsTrigger value="AM">AM</TabsTrigger>
+                    <TabsTrigger value="PM">PM</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="AM" className="mt-3">
+                    <div className="grid grid-cols-4 gap-2">
+                      {amTimes.map((time) => (
+                        <Button
+                          key={time}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedExactTime(time)}
+                          className={cn(
+                            "text-sm",
+                            selectedExactTime === time
+                              ? "border-primary bg-secondary text-primary"
+                              : "border-border hover:border-purple-400"
+                          )}
+                        >
+                          {time.replace(" AM", "")}
+                        </Button>
+                      ))}
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="PM" className="mt-3">
+                    <div className="grid grid-cols-4 gap-2">
+                      {pmTimes.map((time) => (
+                        <Button
+                          key={time}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedExactTime(time)}
+                          className={cn(
+                            "text-sm",
+                            selectedExactTime === time
+                              ? "border-primary bg-secondary text-primary"
+                              : "border-border hover:border-purple-400"
+                          )}
+                        >
+                          {time.replace(" PM", "")}
+                        </Button>
+                      ))}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
             </CollapsibleContent>
           </Collapsible>
 
@@ -336,7 +338,7 @@ const RescheduleCallModal = ({
               Customer's preferred language <span className="text-muted-foreground">(Optional)</span>
             </label>
             <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full h-14 rounded-xl" style={{ borderColor: '#E7E7F0' }}>
                 <SelectValue placeholder="Select from options" />
               </SelectTrigger>
               <SelectContent>
@@ -391,7 +393,7 @@ const RescheduleCallModal = ({
             mode="single"
             selected={pickedDate}
             onSelect={setPickedDate}
-            className="rounded-md border"
+            className="rounded-md border [&_.rdp-day]:text-[#040222] [&_.rdp-day_selected]:bg-[#7C47E1] [&_.rdp-day_selected]:hover:bg-[#7C47E1] [&_.rdp-day_selected]:focus:bg-[#7C47E1]"
             classNames={{
               months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
               month: "space-y-4",
@@ -405,7 +407,7 @@ const RescheduleCallModal = ({
               row: "flex w-full mt-2",
               cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
               day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md",
-              day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+              day_selected: "text-white hover:text-white focus:text-white rounded-md",
             }}
           />
           
