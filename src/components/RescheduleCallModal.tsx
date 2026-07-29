@@ -36,20 +36,10 @@ interface RescheduleCallModalProps {
 
 type DateOption = "today" | "tomorrow" | "dayAfter" | "custom";
 type TimeSlot = "morning" | "afternoon" | "evening";
-type Iteration = "1" | "2" | "3";
+type Iteration = "1" | "2";
 
-// Iteration 1 — 30-min intervals
-const exactTimes30 = [
-  "8:00 AM", "8:30 AM", "9:00 AM", "9:30 AM",
-  "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
-  "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM",
-  "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM",
-  "4:00 PM", "4:30 PM", "5:00 PM", "5:30 PM",
-  "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM", "8:00 PM",
-];
-
-// Iteration 2 — 15-min intervals (from Figma: 8:00am … 8:00pm)
 interface TimeChip { label: string; hour24: number; }
+
 const exactTimes15: TimeChip[] = [];
 for (let h = 8; h <= 20; h++) {
   for (let m = 0; m < 60; m += 15) {
@@ -73,7 +63,6 @@ const slotForHour = (h: number): TimeSlot => {
   return "evening";
 };
 
-// Iteration 3 — hardcoded booked slots
 const bookedSlots = new Set([
   "9:15am", "10:30am", "12:00pm", "1:45pm",
   "3:30pm", "4:15pm", "5:30pm", "6:45pm", "7:15pm",
@@ -98,9 +87,9 @@ const languages = [
   "Kannada", "Marathi", "Bengali", "Gujarati",
 ];
 
-const CHIP_WIDTH = 90;   // px — from Figma
-const CHIP_GAP  = 11;    // px — (101 - 90)
-const SCROLL_BY = 3 * (CHIP_WIDTH + CHIP_GAP); // scroll 3 chips at a time
+const CHIP_WIDTH = 90;
+const CHIP_GAP  = 11;
+const SCROLL_BY = 3 * (CHIP_WIDTH + CHIP_GAP);
 
 const RescheduleCallModal = ({
   open,
@@ -112,7 +101,6 @@ const RescheduleCallModal = ({
 }: RescheduleCallModalProps) => {
   const [iteration, setIteration] = useState<Iteration>("1");
 
-  // Default slot based on current hour
   const defaultSlot = (): TimeSlot => {
     const h = new Date().getHours();
     if (h < 11) return "morning";
@@ -120,7 +108,6 @@ const RescheduleCallModal = ({
     return "evening";
   };
 
-  // Shared state — reset when iteration changes
   const [selectedDate, setSelectedDate] = useState<DateOption | null>(null);
   const [customDate, setCustomDate]     = useState<Date | undefined>(undefined);
   const [customCalOpen, setCustomCalOpen] = useState(false);
@@ -128,7 +115,6 @@ const RescheduleCallModal = ({
   const [selectedExactTime, setSelectedExactTime] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage]   = useState<string>("");
 
-  // Iteration 2 chip-strip scroll ref
   const chipStripRef = useRef<HTMLDivElement>(null);
 
   const today = new Date();
@@ -160,9 +146,8 @@ const RescheduleCallModal = ({
   };
 
   const handleSlotSelect = (id: TimeSlot) => {
-    if (selectedSlot === id) return; // already active — no deselect
+    if (selectedSlot === id) return;
     setSelectedSlot(id);
-    // Clear exact time if it falls outside the newly chosen slot
     if (selectedExactTime) {
       const [lo, hi] = slotHourRange[id];
       const chip = exactTimes15.find((c) => c.label === selectedExactTime);
@@ -172,16 +157,16 @@ const RescheduleCallModal = ({
     }
   };
 
-  // Iteration 2 — chip tap: set exact time AND auto-highlight the parent slot
   const handleChipSelect = (label: string, hour24: number) => {
     if (selectedExactTime === label) {
-      // Deselect chip — keep slot highlighted (agent still wants that window)
       setSelectedExactTime("");
       return;
     }
     setSelectedExactTime(label);
     setSelectedSlot(slotForHour(hour24));
   };
+
+  const slotLabel = timeSlots.find((s) => s.id === selectedSlot)?.label ?? "";
 
   const handleConfirm = () => {
     if (!canConfirm) return;
@@ -210,26 +195,7 @@ const RescheduleCallModal = ({
     onOpenChange(false);
   };
 
-  // ── Iteration 1: Select dropdown ─────────────────────────────────────────
-  const ExactTimeIteration1 = (
-    <div className="flex items-center justify-between w-full px-5 py-3 rounded-[12px] border bg-[#efe9fb] border-[#b191ed]">
-      <span className="text-[16px] font-medium text-[#36354c] shrink-0">
-        Select exact time (optional)
-      </span>
-      <Select value={selectedExactTime} onValueChange={setSelectedExactTime}>
-        <SelectTrigger className="h-auto w-[220px] border-[#e7e7f0] bg-white rounded-[12px] px-3 py-2 text-[14px] font-medium text-[#36354c] focus:ring-0 focus:ring-offset-0">
-          <SelectValue placeholder="Select time" />
-        </SelectTrigger>
-        <SelectContent>
-          {exactTimes30.map((t) => (
-            <SelectItem key={t} value={t}>{t}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-
-  // ── Iteration 2: Horizontal scrollable chip strip ────────────────────────
+  // Iteration 1 (was Iter 2): horizontal scrollable chip strip
   const scrollStrip = (dir: "left" | "right") => {
     chipStripRef.current?.scrollBy({
       left: dir === "left" ? -SCROLL_BY : SCROLL_BY,
@@ -243,11 +209,41 @@ const RescheduleCallModal = ({
     return exactTimes15.filter((c) => c.hour24 >= lo && c.hour24 < hi);
   })();
 
-  const ExactTimeIteration2 = (
+  // Iteration 2 (was Iter 3): hour-row grid
+  const chipsForGrid = (() => {
+    if (!selectedSlot) return exactTimes15;
+    const [lo, hi] = slotHourRange[selectedSlot];
+    return exactTimes15.filter((c) => c.hour24 >= lo && c.hour24 < hi);
+  })();
+
+  const hourGroups = chipsForGrid.reduce<{ hour24: number; chips: TimeChip[] }[]>(
+    (acc, chip) => {
+      const last = acc[acc.length - 1];
+      if (last && last.hour24 === chip.hour24) {
+        last.chips.push(chip);
+      } else {
+        acc.push({ hour24: chip.hour24, chips: [chip] });
+      }
+      return acc;
+    },
+    []
+  );
+
+  const confirmLabel = (() => {
+    if (!dateFriendlyLabel) return "Confirm";
+    const parts: string[] = [dateFriendlyLabel];
+    if (selectedExactTime) {
+      parts.push(selectedExactTime);
+    } else if (slotLabel) {
+      parts.push(slotLabel);
+    }
+    return `Confirm • ${parts.join(", ")}`;
+  })();
+
+  const exactTimeUI = iteration === "1" ? (
     <div className="flex flex-col gap-3">
       <span className="text-[14px] font-normal text-[#5b5675]">Select exact time (optional)</span>
       <div className="flex items-center gap-2">
-        {/* Left scroll arrow */}
         <button
           onClick={() => scrollStrip("left")}
           className="shrink-0 h-11 w-7 flex items-center justify-center rounded-[8px] border border-[#e7e7f0] bg-white hover:border-[#7c47e1]/50 transition-colors"
@@ -255,8 +251,6 @@ const RescheduleCallModal = ({
         >
           <ChevronLeft className="h-4 w-4 text-[#5b5675]" />
         </button>
-
-        {/* Chip strip — clipped viewport */}
         <div
           ref={chipStripRef}
           className="flex-1 overflow-x-auto scroll-smooth"
@@ -281,8 +275,6 @@ const RescheduleCallModal = ({
             ))}
           </div>
         </div>
-
-        {/* Right scroll arrow */}
         <button
           onClick={() => scrollStrip("right")}
           className="shrink-0 h-11 w-7 flex items-center justify-center rounded-[8px] border border-[#e7e7f0] bg-white hover:border-[#7c47e1]/50 transition-colors"
@@ -292,40 +284,15 @@ const RescheduleCallModal = ({
         </button>
       </div>
     </div>
-  );
-
-  // ── Iteration 3: Hour-row grid ───────────────────────────────────────────
-  const chipsForGrid = (() => {
-    if (!selectedSlot) return exactTimes15;
-    const [lo, hi] = slotHourRange[selectedSlot];
-    return exactTimes15.filter((c) => c.hour24 >= lo && c.hour24 < hi);
-  })();
-
-  // Group chips by hour for row rendering
-  const hourGroups = chipsForGrid.reduce<{ hour24: number; chips: TimeChip[] }[]>(
-    (acc, chip) => {
-      const last = acc[acc.length - 1];
-      if (last && last.hour24 === chip.hour24) {
-        last.chips.push(chip);
-      } else {
-        acc.push({ hour24: chip.hour24, chips: [chip] });
-      }
-      return acc;
-    },
-    []
-  );
-
-  const ExactTimeIteration3 = (
+  ) : (
     <div className="flex flex-col gap-3">
       <span className="text-[14px] font-normal text-[#5b5675]">Select exact time (optional)</span>
       <div className="flex flex-col gap-2">
         {hourGroups.map(({ hour24, chips }) => (
           <div key={hour24} className="flex items-center gap-[10px]">
-            {/* Hour label */}
             <span className="w-[44px] shrink-0 text-[12px] font-medium text-[#a9a5be] text-right">
               {hourLabel(hour24)}
             </span>
-            {/* Quarter-hour chips */}
             {chips.map(({ label }) => {
               const booked = bookedSlots.has(label);
               const chosen = selectedExactTime === label;
@@ -345,7 +312,6 @@ const RescheduleCallModal = ({
                 </button>
               );
             })}
-            {/* Pad incomplete rows (e.g. 8:00pm has only 1 chip) */}
             {chips.length < 4 &&
               Array.from({ length: 4 - chips.length }).map((_, i) => (
                 <div key={i} className="flex-1" />
@@ -355,24 +321,6 @@ const RescheduleCallModal = ({
       </div>
     </div>
   );
-
-  const exactTimeUI =
-    iteration === "1" ? ExactTimeIteration1
-    : iteration === "2" ? ExactTimeIteration2
-    : ExactTimeIteration3;
-
-  // Confirm button label — builds up as user makes selections
-  const slotLabel = timeSlots.find((s) => s.id === selectedSlot)?.label ?? "";
-  const confirmLabel = (() => {
-    if (!dateFriendlyLabel) return "Confirm";
-    const parts: string[] = [dateFriendlyLabel];
-    if (selectedExactTime) {
-      parts.push(selectedExactTime);
-    } else if (slotLabel) {
-      parts.push(slotLabel);
-    }
-    return `Confirm • ${parts.join(", ")}`;
-  })();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -388,7 +336,6 @@ const RescheduleCallModal = ({
             <ArrowLeft className="h-6 w-6" />
           </button>
 
-          {/* Title + subtitle */}
           <div className="flex items-start gap-2 flex-1 min-w-0">
             <div className="bg-[#efe9fb] p-1 rounded-[6px] shrink-0 mt-0.5">
               <CalendarDays className="h-6 w-6 text-[#7c47e1]" />
@@ -403,7 +350,7 @@ const RescheduleCallModal = ({
             </div>
           </div>
 
-          {/* Iteration switcher — top-right */}
+          {/* Iteration switcher */}
           <Select value={iteration} onValueChange={handleIterationChange}>
             <SelectTrigger className="h-8 w-[110px] shrink-0 text-[12px] font-medium border-[#e7e7f0] rounded-[8px] focus:ring-0 focus:ring-offset-0 text-[#5b5675]">
               <SelectValue />
@@ -411,7 +358,6 @@ const RescheduleCallModal = ({
             <SelectContent align="end">
               <SelectItem value="1">Iteration 1</SelectItem>
               <SelectItem value="2">Iteration 2</SelectItem>
-              <SelectItem value="3">Iteration 3</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -438,7 +384,6 @@ const RescheduleCallModal = ({
                 </button>
               ))}
 
-              {/* Custom date picker */}
               <Popover open={customCalOpen} onOpenChange={setCustomCalOpen}>
                 <PopoverTrigger asChild>
                   <button
