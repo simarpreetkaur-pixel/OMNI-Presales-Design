@@ -18,6 +18,7 @@ import {
   Headset,
   Check,
   Sparkles,
+  Wrench,
 } from "lucide-react";
 import aiIcon from "@/assets/ai-icon.png";
 import { Button } from "@/components/ui/button";
@@ -291,6 +292,7 @@ const CrmView2 = () => {
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [quoteBuilderOpen, setQuoteBuilderOpen] = useState(false);
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
+  const [rightPanelExpanded, setRightPanelExpanded] = useState(true);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [ozontelOpen, setOzontelOpen] = useState(false);
   const [scheduledTime, setScheduledTime] = useState<{ date: string; time: string } | null>(null);
@@ -467,15 +469,15 @@ const CrmView2 = () => {
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Top Navigation Bar */}
-      <header className="h-[72px] border-b border-border bg-card flex items-center justify-between px-6 shrink-0">
-        <div className="flex items-center gap-3">
+      <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-onyx-300 bg-card px-6">
+        <div className="flex items-center gap-4">
           <img
             src="https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/ACKO%20logo%20primary%20Light%20BG.svg"
             alt="ACKO"
-            className="h-8"
+            className="h-8 w-auto"
           />
-          <div className="h-5 w-px bg-onyx-300" />
-          <span className="text-foreground tracking-tight text-lg font-medium">
+          <div className="h-6 w-px shrink-0 bg-onyx-300" aria-hidden />
+          <span className="text-base font-semibold tracking-tight text-onyx-800">
             OMNI Pre-sales
           </span>
           <Select value={phase} onValueChange={(v) => setPhase(v as "phase1" | "phase2")}>
@@ -504,14 +506,20 @@ const CrmView2 = () => {
       <div className={cn(
         "flex-1 grid overflow-hidden transition-all duration-300 relative",
         phase === "phase1"
-          ? "grid-cols-[328px_1fr_260px]"
+          ? rightPanelExpanded
+            ? "grid-cols-[328px_1fr_260px_63px]"
+            : "grid-cols-[328px_1fr_63px]"
           : quoteBuilderOpen
             ? leftPaneCollapsed
-              ? "grid-cols-[0px_1fr_420px]"
-              : "grid-cols-[280px_1fr_420px]"
+              ? "grid-cols-[0px_1fr_420px_63px]"
+              : "grid-cols-[280px_1fr_420px_63px]"
             : leftPaneCollapsed
-              ? "grid-cols-[0px_1fr]"
-              : "grid-cols-[320px_1fr]"
+              ? rightPanelExpanded
+                ? "grid-cols-[0px_1fr_260px_63px]"
+                : "grid-cols-[0px_1fr_63px]"
+              : rightPanelExpanded
+                ? "grid-cols-[320px_1fr_260px_63px]"
+                : "grid-cols-[320px_1fr_63px]"
       )}>
         {/* Left Pane -- Customer Data */}
         <aside className="relative bg-card shadow-[2px_0_12px_rgba(0,0,0,0.06)] z-10 flex flex-col overflow-hidden">
@@ -885,8 +893,17 @@ const CrmView2 = () => {
           </div>
         </main>
 
-        {/* Right Pane -- Power Tools (Phase I only) */}
-        {phase === "phase1" && (
+        {/* Quote Builder Pane (Phase II inline) */}
+        {phase === "phase2" && (
+          <QuoteBuilder
+            open={quoteBuilderOpen}
+            onOpenChange={setQuoteBuilderOpen}
+            inline
+          />
+        )}
+
+        {/* Right Pane -- Power Tools expanded panel (hidden when quote builder open) */}
+        {rightPanelExpanded && !quoteBuilderOpen && (
           <aside className="bg-card border-l border-border flex flex-col overflow-y-auto">
             <div className="p-5 space-y-3">
               <p className="text-xs font-bold tracking-wide uppercase text-primary px-1">
@@ -915,14 +932,18 @@ const CrmView2 = () => {
           </aside>
         )}
 
-        {/* Quote Builder Pane (Phase II inline) */}
-        {phase === "phase2" && (
-          <QuoteBuilder
-            open={quoteBuilderOpen}
-            onOpenChange={setQuoteBuilderOpen}
-            inline
-          />
-        )}
+        {/* Right strip — always visible, click to toggle panel */}
+        <aside
+          onClick={() => setRightPanelExpanded((prev) => !prev)}
+          className="bg-card border-l border-border flex flex-col items-center pt-5 gap-3 cursor-pointer hover:bg-accent/30 transition-colors select-none"
+        >
+          <div className="h-9 w-9 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
+            <Wrench className="h-4 w-4 text-primary" />
+          </div>
+          <span className="text-[10px] font-semibold tracking-wide text-muted-foreground text-center leading-tight">
+            Power<br />Tools
+          </span>
+        </aside>
       </div>
 
       {/* Floating Call Actions */}
