@@ -904,21 +904,22 @@ const CrmView2 = () => {
 
         {/* Right Pane -- Power Tools expanded panel (hidden when quote builder open) */}
         {rightPanelExpanded && !quoteBuilderOpen && (
-          <aside className="bg-card border-l border-border flex flex-col overflow-y-auto">
-            <div className="p-5 space-y-3">
-              <div className="space-y-1.5">
+          <aside className="bg-white shadow-[-2px_0_4px_rgba(0,0,0,0.09)] z-[1] flex flex-col overflow-y-auto">
+            <div className="p-6 w-full">
+              <div className="flex flex-col gap-3 w-full">
                 {powerTools.map((tool) => {
                   const Icon = tool.icon;
                   return (
                     <button
                       key={tool.label}
+                      type="button"
                       onClick={() => handlePowerToolClick(tool.label)}
-                      className="w-full flex items-center gap-3 px-3 py-3 rounded-xl border border-onyx-300 bg-card hover:bg-purple-200 cursor-pointer transition-colors text-left"
+                      className="w-full flex items-center gap-4 px-4 py-3 rounded-xl border border-[#d0bdf4]/60 bg-white shadow-[0_1px_3px_rgba(54,53,76,0.06)] hover:bg-[#f8f7fc] cursor-pointer transition-colors text-left"
                     >
-                      <div className="h-9 w-9 rounded-lg bg-purple-200 flex items-center justify-center shrink-0">
-                        <Icon className="h-4 w-4 text-primary" />
+                      <div className="size-10 rounded-lg bg-[#efe9fb] flex items-center justify-center shrink-0">
+                        <Icon className="size-6 text-[#7c47e1]" strokeWidth={1.75} />
                       </div>
-                      <span className="text-sm font-medium text-foreground">
+                      <span className="text-sm font-medium text-[#36354c] leading-5">
                         {tool.label}
                       </span>
                     </button>
@@ -929,16 +930,36 @@ const CrmView2 = () => {
           </aside>
         )}
 
-        {/* Right strip — always visible, click to toggle panel */}
+        {/* Right strip — collapsed / hover / expanded (Figma) */}
         <aside
+          role="button"
+          tabIndex={0}
+          aria-expanded={rightPanelExpanded}
+          aria-label={rightPanelExpanded ? "Collapse Power tools" : "Expand Power tools"}
           onClick={() => setRightPanelExpanded((prev) => !prev)}
-          className="bg-card border-l border-border flex flex-col items-center pt-5 gap-3 cursor-pointer hover:bg-accent/30 transition-colors select-none"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setRightPanelExpanded((prev) => !prev);
+            }
+          }}
+          className="group relative z-[2] w-[63px] min-w-[63px] bg-white border-l border-[#e7e7f0] shadow-[-2px_0_4px_rgba(0,0,0,0.09)] flex flex-col items-center pt-4 gap-1.5 cursor-pointer select-none"
         >
-          <div className="h-9 w-9 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
-            <Wrench className="h-4 w-4 text-primary" />
+          <div
+            className={cn(
+              "flex size-8 items-center justify-center rounded-lg shrink-0 transition-colors duration-150",
+              rightPanelExpanded
+                ? "bg-[#f8f7fc]"
+                : "bg-transparent group-hover:bg-[#f8f7fc]"
+            )}
+          >
+            <Wrench className="size-5 text-[#5b5675]" strokeWidth={1.75} />
           </div>
-          <span className="text-[10px] font-semibold tracking-wide text-muted-foreground text-center leading-tight">
-            Power<br />Tools
+          <span
+            className="mt-1 text-[10px] font-medium leading-[1.3] text-[#5b5675] whitespace-nowrap"
+            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+          >
+            Power tools
           </span>
         </aside>
       </div>
