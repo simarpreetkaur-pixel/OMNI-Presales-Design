@@ -7,8 +7,9 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   base: mode === "production" ? "/OMNI-Presales-Design/" : "/",
   server: {
-    host: "::",
+    host: true,
     port: 8080,
+    strictPort: true,
     hmr: {
       overlay: false,
     },

@@ -84,7 +84,7 @@ const OutgoingCallModal = ({ open, onOpenChange }: OutgoingCallModalProps) => {
         <div className="px-8 flex flex-col items-center gap-4 py-4 bg-blue-100">
           <img src={profileIcon} alt="Profile" className="h-16 w-16 rounded-2xl" />
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-foreground">Rajesh Kumar</h2>
+            <h2 className="text-xl font-bold text-foreground">Rajesh Kumar</h2>
             <p className="text-muted-foreground mt-1 text-sm">Preferred Language: Hindi</p>
           </div>
           <div className="flex gap-3 -mt-1">

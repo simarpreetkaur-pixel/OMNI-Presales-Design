@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, X, ClipboardList, CheckCircle2 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -13,6 +12,7 @@ interface NotInterestedChecklistModalProps {
   onBack: () => void;
   customerName?: string;
   product?: string;
+  onEnableDND?: () => void;
 }
 
 const questions = [
@@ -26,7 +26,8 @@ const NotInterestedChecklistModal = ({
   onOpenChange,
   onBack,
   customerName = "Rajesh Kumar",
-  product = "Car Insurance",
+  product = "Car_Comprehensive",
+  onEnableDND,
 }: NotInterestedChecklistModalProps) => {
   const [checked, setChecked] = useState<boolean[]>(new Array(questions.length).fill(false));
 
@@ -38,10 +39,7 @@ const NotInterestedChecklistModal = ({
     });
   };
 
-  const allChecked = checked.every(Boolean);
-  const checkedCount = checked.filter(Boolean).length;
-
-  const handleConfirm = () => {
+  const handleMarkNotInterested = () => {
     toast(
       <div className="relative flex items-center gap-3 pr-6">
         <button
@@ -50,9 +48,7 @@ const NotInterestedChecklistModal = ({
         >
           <X className="h-3.5 w-3.5" />
         </button>
-        <div className="h-5 w-5 animate-scale-in">
-          <CheckCircle2 className="h-5 w-5 text-success" />
-        </div>
+        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
         <p className="text-sm">Disposition for {customerName} will be complete automatically</p>
       </div>,
       { duration: 3000, position: "bottom-right" }
@@ -60,97 +56,89 @@ const NotInterestedChecklistModal = ({
     onOpenChange(false);
   };
 
+  const handleEnableDND = () => {
+    onOpenChange(false);
+    onEnableDND?.();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden rounded-[20px] border-border shadow-xl [&>button:last-child]:hidden">
-        <DialogTitle className="sr-only">Not Interested Checklist</DialogTitle>
+      <DialogContent className="w-full max-w-[552px] p-0 gap-0 overflow-hidden rounded-[24px] border-border shadow-xl [&>button:last-child]:hidden">
+        <DialogTitle className="sr-only">Disposition checklist</DialogTitle>
 
         {/* Header */}
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-border bg-card">
-          <Button
-            variant="ghost"
-            size="icon"
+        <div className="flex items-start gap-5 px-5 py-4 border-b border-[#f0f0f6] bg-white">
+          <button
             onClick={onBack}
-            className="h-8 w-8 rounded-lg"
+            className="mt-0.5 shrink-0 text-[#36354c] hover:text-[#040222] transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-foreground" />
-          </Button>
-          <div className="h-11 w-11 rounded-full flex items-center justify-center shrink-0 bg-cerise-100">
-            <ClipboardList className="h-5 w-5 text-cerise-600" />
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <div className="flex items-start gap-2">
+            <div className="bg-[#efe9fb] p-1 rounded-[6px] shrink-0 mt-0.5">
+              <ClipboardList className="h-6 w-6 text-[#7c47e1]" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[18px] font-semibold leading-6 text-[#36354c]">
+                Disposition checklist
+              </span>
+              <span className="text-[16px] font-normal leading-6 text-[#5b5675]">
+                {customerName} • {product}
+              </span>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-semibold text-foreground">
-              Disposition Checklist
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {customerName} · {product}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onOpenChange(false)}
-            className="h-8 w-8 rounded-lg"
-          >
-            <X className="h-5 w-5 text-muted-foreground" />
-          </Button>
         </div>
 
-        <Separator className="bg-border" />
-
         {/* Content */}
-        <div className="px-6 py-6 space-y-3 bg-white">
-          <p className="text-xs font-semibold tracking-wider uppercase text-muted-foreground" style={{ letterSpacing: '0.5px' }}>
+        <div className="px-6 pt-5 pb-0 bg-white">
+          <p className="text-[16px] font-normal text-[#5b5675] mb-3">
             Ensure you've asked these questions
           </p>
-
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             {questions.map((question, index) => (
-              <Button
+              <button
                 key={index}
-                variant="outline"
                 onClick={() => toggle(index)}
                 className={cn(
-                  "w-full flex items-start gap-4 p-4 h-auto rounded-2xl text-left justify-start",
+                  "w-full flex items-start gap-[10px] p-5 rounded-[12px] border text-left transition-colors",
                   checked[index]
-                    ? "border-border bg-card"
-                    : "border-border bg-card hover:border-purple-400"
+                    ? "border-[#b191ed] bg-[#efe9fb]"
+                    : "border-[#e7e7f0] bg-white hover:border-[#b191ed]/60"
                 )}
               >
-                <div className="mt-0.5 shrink-0">
-                  <Checkbox
-                    checked={checked[index]}
-                    onCheckedChange={() => toggle(index)}
-                    className={cn(
-                      "h-5 w-5 rounded-md",
-                      checked[index] && "bg-primary border-primary text-primary-foreground"
-                    )}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "text-sm font-medium transition-colors whitespace-normal",
-                    checked[index] ? "text-muted-foreground line-through" : "text-foreground"
-                  )}>
-                    {question}
-                  </p>
-                </div>
-              </Button>
+                <Checkbox
+                  checked={checked[index]}
+                  onCheckedChange={() => toggle(index)}
+                  className={cn(
+                    "mt-0.5 h-5 w-5 rounded-[4px] shrink-0",
+                    checked[index] && "bg-[#7c47e1] border-[#7c47e1]"
+                  )}
+                />
+                <p className={cn(
+                  "text-[16px] font-medium leading-6 transition-colors",
+                  checked[index] ? "text-[#5b5675]" : "text-[#36354c]"
+                )}>
+                  {question}
+                </p>
+              </button>
             ))}
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="px-6 pb-6 pt-3 space-y-4 bg-white">
+        {/* Footer CTAs */}
+        <div className="px-[64px] py-6 flex flex-col items-center gap-4 bg-white">
           <Button
-            className="w-full rounded-2xl gap-2"
-            size="lg"
-            
-            onClick={handleConfirm}
+            className="w-full h-14 rounded-[16px] text-[16px] font-medium bg-[#7c47e1] hover:bg-[#5920c5] text-white"
+            onClick={handleMarkNotInterested}
           >
-            <ClipboardList className="h-5 w-5" />
-            Mark as Not Interested
+            Mark as not interested
           </Button>
+          <button
+            onClick={handleEnableDND}
+            className="text-[14px] font-medium text-[#5b5675] underline underline-offset-2 decoration-dotted hover:text-[#36354c] transition-colors"
+          >
+            Mark as not interested & Enable DND
+          </button>
         </div>
       </DialogContent>
     </Dialog>

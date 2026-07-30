@@ -906,9 +906,6 @@ const CrmView2 = () => {
         {rightPanelExpanded && !quoteBuilderOpen && (
           <aside className="bg-card border-l border-border flex flex-col overflow-y-auto">
             <div className="p-5 space-y-3">
-              <p className="text-xs font-bold tracking-wide uppercase text-primary px-1">
-                Power Tools
-              </p>
               <div className="space-y-1.5">
                 {powerTools.map((tool) => {
                   const Icon = tool.icon;

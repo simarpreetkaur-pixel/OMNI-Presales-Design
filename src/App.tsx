@@ -11,12 +11,18 @@ import CrmView2 from "./pages/CrmView2";
 
 const queryClient = new QueryClient();
 
+/** Align with Vite `base`: `/` in dev (localhost), `/OMNI-Presales-Design/` in production (GitHub Pages). */
+const routerBasename =
+  import.meta.env.MODE === "development"
+    ? undefined
+    : import.meta.env.BASE_URL.replace(/\/$/, "");
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter basename="/OMNI-Presales-Design">
+      <BrowserRouter basename={routerBasename}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/crm" element={<CrmView />} />

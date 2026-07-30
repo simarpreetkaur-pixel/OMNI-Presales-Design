@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,8 +9,6 @@ import {
   Sun,
   Sunset,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -36,7 +34,6 @@ interface RescheduleCallModalProps {
 
 type DateOption = "today" | "tomorrow" | "dayAfter" | "custom";
 type TimeSlot = "morning" | "afternoon" | "evening";
-type Iteration = "1" | "2";
 
 interface TimeChip { label: string; hour24: number; }
 
@@ -87,10 +84,6 @@ const languages = [
   "Kannada", "Marathi", "Bengali", "Gujarati",
 ];
 
-const CHIP_WIDTH = 90;
-const CHIP_GAP  = 11;
-const SCROLL_BY = 3 * (CHIP_WIDTH + CHIP_GAP);
-
 const RescheduleCallModal = ({
   open,
   onOpenChange,
@@ -99,8 +92,6 @@ const RescheduleCallModal = ({
   product = "Car_Comprehensive",
   onConfirm,
 }: RescheduleCallModalProps) => {
-  const [iteration, setIteration] = useState<Iteration>("1");
-
   const defaultSlot = (): TimeSlot => {
     const h = new Date().getHours();
     if (h < 11) return "morning";
@@ -114,8 +105,6 @@ const RescheduleCallModal = ({
   const [selectedSlot, setSelectedSlot]  = useState<TimeSlot>(defaultSlot);
   const [selectedExactTime, setSelectedExactTime] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage]   = useState<string>("");
-
-  const chipStripRef = useRef<HTMLDivElement>(null);
 
   const today = new Date();
 
@@ -139,11 +128,6 @@ const RescheduleCallModal = ({
   const dateLabel = selectedDate ? getDateLabel(selectedDate) : null;
   const dateFriendlyLabel = selectedDate ? getDateFriendlyLabel(selectedDate) : null;
   const canConfirm = selectedDate !== null;
-
-  const handleIterationChange = (val: string) => {
-    setIteration(val as Iteration);
-    setSelectedExactTime("");
-  };
 
   const handleSlotSelect = (id: TimeSlot) => {
     if (selectedSlot === id) return;
@@ -195,21 +179,6 @@ const RescheduleCallModal = ({
     onOpenChange(false);
   };
 
-  // Iteration 1 (was Iter 2): horizontal scrollable chip strip
-  const scrollStrip = (dir: "left" | "right") => {
-    chipStripRef.current?.scrollBy({
-      left: dir === "left" ? -SCROLL_BY : SCROLL_BY,
-      behavior: "smooth",
-    });
-  };
-
-  const filteredChips = (() => {
-    if (!selectedSlot) return exactTimes15;
-    const [lo, hi] = slotHourRange[selectedSlot];
-    return exactTimes15.filter((c) => c.hour24 >= lo && c.hour24 < hi);
-  })();
-
-  // Iteration 2 (was Iter 3): hour-row grid
   const chipsForGrid = (() => {
     if (!selectedSlot) return exactTimes15;
     const [lo, hi] = slotHourRange[selectedSlot];
@@ -240,88 +209,6 @@ const RescheduleCallModal = ({
     return `Confirm • ${parts.join(", ")}`;
   })();
 
-  const exactTimeUI = iteration === "1" ? (
-    <div className="flex flex-col gap-3">
-      <span className="text-[14px] font-normal text-[#5b5675]">Select exact time (optional)</span>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => scrollStrip("left")}
-          className="shrink-0 h-11 w-7 flex items-center justify-center rounded-[8px] border border-[#e7e7f0] bg-white hover:border-[#7c47e1]/50 transition-colors"
-          aria-label="Scroll left"
-        >
-          <ChevronLeft className="h-4 w-4 text-[#5b5675]" />
-        </button>
-        <div
-          ref={chipStripRef}
-          className="flex-1 overflow-x-auto scroll-smooth"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          <style>{`.chip-strip::-webkit-scrollbar { display: none; }`}</style>
-          <div className="chip-strip flex" style={{ gap: `${CHIP_GAP}px` }}>
-            {filteredChips.map(({ label, hour24 }) => (
-              <button
-                key={label}
-                onClick={() => handleChipSelect(label, hour24)}
-                style={{ minWidth: `${CHIP_WIDTH}px` }}
-                className={cn(
-                  "h-11 flex items-center justify-center rounded-[8px] border text-[14px] font-medium transition-colors shrink-0",
-                  selectedExactTime === label
-                    ? "bg-[#efe9fb] border-[#7c47e1] text-[#36354c]"
-                    : "border-[#e7e7f0] bg-white text-[#36354c] hover:border-[#7c47e1]/50"
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <button
-          onClick={() => scrollStrip("right")}
-          className="shrink-0 h-11 w-7 flex items-center justify-center rounded-[8px] border border-[#e7e7f0] bg-white hover:border-[#7c47e1]/50 transition-colors"
-          aria-label="Scroll right"
-        >
-          <ChevronRight className="h-4 w-4 text-[#5b5675]" />
-        </button>
-      </div>
-    </div>
-  ) : (
-    <div className="flex flex-col gap-3">
-      <span className="text-[14px] font-normal text-[#5b5675]">Select exact time (optional)</span>
-      <div className="flex flex-col gap-2">
-        {hourGroups.map(({ hour24, chips }) => (
-          <div key={hour24} className="flex items-center gap-[10px]">
-            <span className="w-[44px] shrink-0 text-[12px] font-medium text-[#a9a5be] text-right">
-              {hourLabel(hour24)}
-            </span>
-            {chips.map(({ label }) => {
-              const booked = bookedSlots.has(label);
-              const chosen = selectedExactTime === label;
-              return (
-                <button
-                  key={label}
-                  disabled={booked}
-                  onClick={() => !booked && handleChipSelect(label, hour24)}
-                  className={cn(
-                    "flex-1 h-10 flex items-center justify-center rounded-[10px] border text-[13px] font-medium transition-colors",
-                    chosen  && "bg-[#efe9fb] border-[#7c47e1] text-[#36354c]",
-                    booked  && "bg-[#f5f4fb] border-[#e7e7f0] text-[#c4c1d6] line-through cursor-not-allowed",
-                    !chosen && !booked && "border-[#e7e7f0] bg-white text-[#36354c] hover:border-[#7c47e1]/50"
-                  )}
-                >
-                  {label}
-                </button>
-              );
-            })}
-            {chips.length < 4 &&
-              Array.from({ length: 4 - chips.length }).map((_, i) => (
-                <div key={i} className="flex-1" />
-              ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-full max-w-[552px] p-0 gap-0 overflow-hidden border-border shadow-xl rounded-[24px] [&>button:last-child]:hidden">
@@ -349,17 +236,6 @@ const RescheduleCallModal = ({
               </span>
             </div>
           </div>
-
-          {/* Iteration switcher */}
-          <Select value={iteration} onValueChange={handleIterationChange}>
-            <SelectTrigger className="h-8 w-[110px] shrink-0 text-[12px] font-medium border-[#e7e7f0] rounded-[8px] focus:ring-0 focus:ring-offset-0 text-[#5b5675]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="1">Iteration 1</SelectItem>
-              <SelectItem value="2">Iteration 2</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {/* ── Body ───────────────────────────────────────────────────────── */}
@@ -447,8 +323,44 @@ const RescheduleCallModal = ({
             </div>
           </div>
 
-          {/* Select Exact Time — only shown after a slot is chosen */}
-          {selectedSlot && exactTimeUI}
+          {/* Select Exact Time — hour-row grid (only after a slot is chosen) */}
+          {selectedSlot && (
+            <div className="flex flex-col gap-3">
+              <span className="text-[14px] font-normal text-[#5b5675]">Select exact time (optional)</span>
+              <div className="flex flex-col gap-2">
+                {hourGroups.map(({ hour24, chips }) => (
+                  <div key={hour24} className="flex items-center gap-[10px]">
+                    <span className="w-[44px] shrink-0 text-[12px] font-medium text-[#a9a5be] text-right">
+                      {hourLabel(hour24)}
+                    </span>
+                    {chips.map(({ label }) => {
+                      const booked = bookedSlots.has(label);
+                      const chosen = selectedExactTime === label;
+                      return (
+                        <button
+                          key={label}
+                          disabled={booked}
+                          onClick={() => !booked && handleChipSelect(label, hour24)}
+                          className={cn(
+                            "flex-1 h-10 flex items-center justify-center rounded-[10px] border text-[13px] font-medium transition-colors",
+                            chosen  && "bg-[#efe9fb] border-[#7c47e1] text-[#36354c]",
+                            booked  && "bg-[#f5f4fb] border-[#e7e7f0] text-[#c4c1d6] line-through cursor-not-allowed",
+                            !chosen && !booked && "border-[#e7e7f0] bg-white text-[#36354c] hover:border-[#7c47e1]/50"
+                          )}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                    {chips.length < 4 &&
+                      Array.from({ length: 4 - chips.length }).map((_, i) => (
+                        <div key={i} className="flex-1" />
+                      ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Customer's preferred language (Optional) */}
           <div className="flex flex-col gap-3">
