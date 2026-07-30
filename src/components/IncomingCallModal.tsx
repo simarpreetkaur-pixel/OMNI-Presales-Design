@@ -49,7 +49,7 @@ const IncomingCallModal = ({ open, onOpenChange }: IncomingCallModalProps) => {
         <div className="px-8 flex flex-col items-center gap-4 py-4 bg-green-100">
           <img src={profileIcon} alt="Profile" className="h-16 w-16 rounded-2xl" />
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-foreground">Pooja Arora</h2>
+            <h2 className="text-xl font-bold text-foreground">Pooja Arora</h2>
             <p className="text-base text-muted-foreground mt-1">Preferred Language: English</p>
           </div>
           <div className="flex gap-3 -mt-1">
