@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,14 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
+export type ReschedulePreset = {
+  dateOption?: "today" | "tomorrow" | "dayAfter";
+  exactTime?: string;
+  language?: string;
+  /** When set, confirm automatically after this many ms (Phase III agent). */
+  autoConfirmMs?: number;
+};
+
 interface RescheduleCallModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -30,6 +38,7 @@ interface RescheduleCallModalProps {
   customerName?: string;
   product?: string;
   onConfirm?: (date: string, time: string) => void;
+  preset?: ReschedulePreset | null;
 }
 
 type DateOption = "today" | "tomorrow" | "dayAfter" | "custom";
@@ -91,6 +100,7 @@ const RescheduleCallModal = ({
   customerName = "Rajesh Kumar",
   product = "Car_Comprehensive",
   onConfirm,
+  preset = null,
 }: RescheduleCallModalProps) => {
   const defaultSlot = (): TimeSlot => {
     const h = new Date().getHours();
@@ -107,6 +117,23 @@ const RescheduleCallModal = ({
   const [selectedLanguage, setSelectedLanguage]   = useState<string>("");
 
   const today = new Date();
+
+  useEffect(() => {
+    if (!open) return;
+    if (!preset) {
+      setSelectedDate(null);
+      setSelectedExactTime("");
+      setSelectedSlot(defaultSlot());
+      setSelectedLanguage("");
+      return;
+    }
+    const time = preset.exactTime ?? "";
+    const chip = exactTimes15.find((c) => c.label === time);
+    setSelectedDate(preset.dateOption ?? "tomorrow");
+    setSelectedExactTime(time);
+    setSelectedSlot(chip ? slotForHour(chip.hour24) : "morning");
+    setSelectedLanguage(preset.language ?? "Hindi");
+  }, [open, preset]);
 
   const getDateLabel = (opt: DateOption): string => {
     const d = new Date(today);
@@ -178,6 +205,16 @@ const RescheduleCallModal = ({
     }
     onOpenChange(false);
   };
+
+  useEffect(() => {
+    if (!open || !preset?.autoConfirmMs || !canConfirm) return;
+    const id = window.setTimeout(() => {
+      handleConfirm();
+    }, preset.autoConfirmMs);
+    return () => window.clearTimeout(id);
+    // Intentionally only when modal opens with an auto-confirm preset
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, preset?.autoConfirmMs, canConfirm]);
 
   const chipsForGrid = (() => {
     if (!selectedSlot) return exactTimes15;

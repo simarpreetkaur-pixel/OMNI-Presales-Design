@@ -87,7 +87,7 @@ const IncomingCallModal2 = ({ open, onOpenChange }: IncomingCallModal2Props) => 
         </div>
 
         {/* Profile Banner */}
-        <div className="bg-[#f3f7ff] py-3 px-6 flex flex-col items-center gap-2">
+        <div className="bg-green-200 py-3 px-6 flex flex-col items-center gap-2">
           <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center shadow-sm">
             <FemaleAvatar />
           </div>

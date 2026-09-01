@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Check, Plus, Trash2, X } from "lucide-react";
 import {
   Sheet,
@@ -16,21 +16,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import SendQuoteModal from "@/components/SendQuoteModal";
 
-interface QuoteBuilderProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  inline?: boolean;
-}
-
-interface Member {
+export interface Member {
   type: string;
   name: string;
   age: string;
 }
 
-interface QuoteFormData {
+export interface QuoteFormData {
   fullName: string;
   age: string;
   phoneNumber: string;
@@ -39,6 +34,19 @@ interface QuoteFormData {
   pincode: string;
   members: Member[];
   selectedPlan: string;
+}
+
+interface QuoteBuilderProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  inline?: boolean;
+  /** Prefill form when opened (e.g. Phase III agent). */
+  initialData?: QuoteFormData;
+  /** Jump to a step when opened with initialData (0–3). */
+  initialStep?: number;
+  /** Animate through steps toward summary, then open send modal. */
+  agentAutoFill?: boolean;
+  onAgentFillComplete?: () => void;
 }
 
 const STEPS = [
@@ -83,16 +91,55 @@ const INITIAL_DATA: QuoteFormData = {
   selectedPlan: "acko-platinum",
 };
 
-const QuoteBuilder = ({ open, onOpenChange, inline = false }: QuoteBuilderProps) => {
+const QuoteBuilder = ({
+  open,
+  onOpenChange,
+  inline = false,
+  initialData,
+  initialStep = 0,
+  agentAutoFill = false,
+  onAgentFillComplete,
+}: QuoteBuilderProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<QuoteFormData>({ ...INITIAL_DATA });
   const [sendQuoteOpen, setSendQuoteOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const data = initialData ? { ...initialData, members: [...initialData.members] } : { ...INITIAL_DATA };
+    setFormData(data);
+    setCurrentStep(initialData ? initialStep : 0);
+    setSendQuoteOpen(false);
+  }, [open, initialData, initialStep]);
+
+  useEffect(() => {
+    if (!open || !agentAutoFill || !initialData) return;
+
+    const timers: number[] = [];
+    // Walk steps so the agent visibly fills the tool
+    setCurrentStep(0);
+    timers.push(window.setTimeout(() => setCurrentStep(1), 450));
+    timers.push(window.setTimeout(() => setCurrentStep(2), 900));
+    timers.push(window.setTimeout(() => setCurrentStep(3), 1350));
+    timers.push(
+      window.setTimeout(() => {
+        toast.success("Quote shared on WhatsApp (…4321) and email", {
+          duration: 3000,
+          position: "bottom-right",
+        });
+        onAgentFillComplete?.();
+      }, 1900)
+    );
+
+    return () => timers.forEach((id) => window.clearTimeout(id));
+  }, [open, agentAutoFill, initialData, onAgentFillComplete]);
 
   const resetAndClose = useCallback(() => {
     onOpenChange(false);
     setTimeout(() => {
       setCurrentStep(0);
       setFormData({ ...INITIAL_DATA });
+      setSendQuoteOpen(false);
     }, 300);
   }, [onOpenChange]);
 

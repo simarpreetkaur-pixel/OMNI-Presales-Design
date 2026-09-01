@@ -50,7 +50,7 @@ const OutgoingCallModal3 = ({ open, onOpenChange }: OutgoingCallModal3Props) => 
           <DialogTitle className="sr-only">Fresh Lead – Rajesh Kumar</DialogTitle>
 
           {/* Header */}
-          <div className="flex items-center justify-start gap-2 px-5 py-3 border-b border-[#f0f0f6] bg-white">
+          <div className="flex h-12 shrink-0 items-center justify-start gap-2 px-5 border-b border-[#f0f0f6] bg-white">
             {!isConnected ? (
               <>
                 <Phone className="h-5 w-5 text-[#36354c]" />
