@@ -18,6 +18,8 @@ import {
   Sparkles,
   Wrench,
   ClipboardList,
+  MoreHorizontal,
+  Ban,
   Infinity as InfinityIcon,
   ChevronDown,
   Radio,
@@ -55,6 +57,13 @@ import Phase3CallCaptionRibbon from "@/components/Phase3CallCaptionRibbon";
 import ackoFabIcon from "@/assets/acko-fab-icon.png";
 import AppHeader from "@/components/AppHeader";
 import AgentNotesPanel from "@/components/AgentNotesPanel";
+import PostCallActionRibbon from "@/components/PostCallActionRibbon";
+import DNDConfirmModal from "@/components/DNDConfirmModal";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 type Phase3Mode = "listen" | "agent";
 
@@ -310,6 +319,8 @@ const CrmView2 = () => {
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
   const [rightPanelExpanded, setRightPanelExpanded] = useState(true);
   const [rightRail, setRightRail] = useState<"tools" | "notes">("tools");
+  const [postCallSecondsRemaining, setPostCallSecondsRemaining] = useState<number | null>(null);
+  const [showDNDConfirm, setShowDNDConfirm] = useState(false);
   /** Phase II/III: which right-rail tool is open; null = panel closed */
   const [activeRightTool, setActiveRightTool] = useState<RightTool | null>(null);
   const isToolPhase = phase === "phase2" || phase === "phase3";
@@ -408,6 +419,20 @@ const CrmView2 = () => {
       setLeftPaneCollapsed(false);
     }
   }, [phase]);
+
+  useEffect(() => {
+    if (postCallSecondsRemaining === null) return;
+    if (postCallSecondsRemaining === 0) {
+      navigate("/");
+      return;
+    }
+
+    const countdown = window.setTimeout(
+      () => setPostCallSecondsRemaining((seconds) => (seconds === null ? null : seconds - 1)),
+      1000
+    );
+    return () => window.clearTimeout(countdown);
+  }, [navigate, postCallSecondsRemaining]);
 
   const setQuoteBuilderOpen = useCallback((open: boolean) => {
     setActiveRightTool(open ? "Quote Creator" : null);
@@ -692,6 +717,14 @@ const CrmView2 = () => {
         }
       />
 
+      {postCallSecondsRemaining !== null && (
+        <PostCallActionRibbon
+          secondsRemaining={postCallSecondsRemaining}
+          onCallBack={() => navigate("/", { state: { openOutgoingCall: true } })}
+          onReadyForNextCall={() => navigate("/")}
+        />
+      )}
+
       {/* Phase III only — live call captions (closed-caption style) */}
       {phase === "phase3" && phase3Mode === "listen" && (
         <Phase3CallCaptionRibbon
@@ -734,9 +767,36 @@ const CrmView2 = () => {
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
             {/* Container 1: Customer Details */}
             <div className="rounded-xl border border-onyx-300 p-4 space-y-3">
-              <p className="text-xs font-semibold tracking-wide text-[#5B5675] uppercase">
-                Customer Details
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold tracking-wide text-[#5B5675] uppercase">
+                  Customer Details
+                </p>
+                <HoverCard openDelay={150} closeDelay={100}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      type="button"
+                      className="rounded-md p-0.5 text-[#5b5675] hover:bg-[#f8f7fc] hover:text-[#36354c]"
+                      aria-label="Customer actions"
+                    >
+                      <MoreHorizontal className="size-5" strokeWidth={1.75} />
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    side="bottom"
+                    align="end"
+                    className="w-auto rounded-lg border-[#e7e7f0] p-3 shadow-[0_5px_10px_rgba(0,0,0,0.02)]"
+                  >
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 whitespace-nowrap text-xs font-medium text-[#d83d37] hover:text-[#bb302b]"
+                      onClick={() => setShowDNDConfirm(true)}
+                    >
+                      <Ban className="size-5" strokeWidth={1.75} />
+                      Mark customer DND
+                    </button>
+                  </HoverCardContent>
+                </HoverCard>
+              </div>
               <div className="h-px bg-border" />
               <div className="space-y-3">
                 <div className="flex items-baseline justify-between gap-3">
@@ -1429,38 +1489,7 @@ const CrmView2 = () => {
           customer={isPooja ? "pooja" : isRajesh2 ? "rajesh2" : "rajesh"}
           onEndCall={() => {
             setOzontelOpen(false);
-            navigate("/");
-            setTimeout(() => {
-              toast(
-                <div className="flex items-stretch gap-0">
-                  <div className="flex items-center pr-4 shrink-0">
-                    <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center shrink-0">
-                      <Check className="h-4 w-4 text-white" />
-                    </div>
-                  </div>
-                  <p className="text-sm flex-1 pr-4">
-                    Call with <span className="font-semibold">{isPooja ? "Pooja Arora" : "Rajesh Kumar"}</span> has ended. Disposition will be done automatically.
-                  </p>
-                  <div className="w-px bg-border shrink-0" />
-                  <div className="flex flex-col shrink-0 pl-4">
-                    <button
-                      className="text-sm font-medium text-primary hover:underline py-1"
-                      onClick={() => { toast.dismiss(); }}
-                    >
-                      Dismiss
-                    </button>
-                    <div className="h-px bg-border" />
-                    <button
-                      className="text-sm font-medium text-primary hover:underline py-1"
-                      onClick={() => { toast.dismiss(); navigate("/", { state: { confirmCallback: true } }); }}
-                    >
-                      Call back
-                    </button>
-                  </div>
-                </div>,
-                { duration: 4000, position: "bottom-right" }
-              );
-            }, 100);
+            setPostCallSecondsRemaining(30);
           }}
         />
       )}
@@ -1478,6 +1507,13 @@ const CrmView2 = () => {
         product={phase === "phase3" ? "Family_Floater_Health" : undefined}
         preset={reschedulePreset}
         onConfirm={(date, time) => setScheduledTime({ date, time })}
+      />
+
+      <DNDConfirmModal
+        open={showDNDConfirm}
+        onOpenChange={setShowDNDConfirm}
+        onBack={() => setShowDNDConfirm(false)}
+        customerName={isPooja ? "Pooja Arora" : "Rajesh Kumar"}
       />
 
     </div>
