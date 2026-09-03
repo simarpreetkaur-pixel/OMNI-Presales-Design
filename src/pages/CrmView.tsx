@@ -14,6 +14,7 @@ import PredictiveCTABar from "@/components/PredictiveCTABar";
 import PlanComparison from "@/components/PlanComparison";
 import QuickActionsDrawer, { type QuickAction } from "@/components/QuickActionsDrawer";
 import RescheduleCallModal from "@/components/RescheduleCallModal";
+import AppHeader from "@/components/AppHeader";
 
 // --- Rajesh Kumar data ---
 const rajeshAiSuggestions = [
@@ -404,20 +405,7 @@ const CrmView = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background">
-      {/* Top Navigation Bar */}
-      <header className="h-[72px] border-b border-border bg-card flex items-center px-6 shrink-0">
-        <div className="flex items-center gap-3">
-          <img
-            src="https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/ACKO%20logo%20primary%20Light%20BG.svg"
-            alt="ACKO"
-            className="h-8" />
-          
-          <div className="h-5 w-px bg-border" />
-          <span className="text-foreground tracking-tight text-lg font-medium">
-            OMNI Pre-sales
-          </span>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">

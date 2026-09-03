@@ -9,6 +9,7 @@ import callbackIllustration from "@/assets/callback-illustration.png";
 import OutgoingCallModal2 from "@/components/OutgoingCallModal2";
 import OutgoingCallModal3 from "@/components/OutgoingCallModal3";
 import IncomingCallModal2 from "@/components/IncomingCallModal2";
+import AppHeader from "@/components/AppHeader";
 
 const Index = () => {
   const location = useLocation();
@@ -32,20 +33,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Top Navigation Bar — ACKO spacing: px-6 (24px), nav height 56px */}
-      <header className="h-14 shrink-0 flex items-center justify-between border-b border-onyx-300 bg-card px-6">
-        <div className="flex items-center gap-4">
-          <img
-            src="https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/ACKO%20logo%20primary%20Light%20BG.svg"
-            alt="ACKO"
-            className="h-8 w-auto"
-          />
-          <div className="h-6 w-px shrink-0 bg-onyx-300" aria-hidden />
-          <span className="text-base font-semibold tracking-tight text-onyx-800">
-            OMNI Pre-sales
-          </span>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Content Area */}
       <main

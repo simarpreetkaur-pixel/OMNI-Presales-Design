@@ -54,6 +54,7 @@ import Phase3NextBestActions, {
 } from "@/components/Phase3AgentFeed";
 import Phase3CallCaptionRibbon from "@/components/Phase3CallCaptionRibbon";
 import ackoFabIcon from "@/assets/acko-fab-icon.png";
+import AppHeader from "@/components/AppHeader";
 
 type Phase3Mode = "listen" | "agent";
 
@@ -677,21 +678,8 @@ const CrmView2 = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background">
-      {/* Top Navigation Bar */}
-      <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-onyx-300 bg-card px-6">
-        <div className="flex items-center gap-4">
-          <img
-            src="https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/ACKO%20logo%20primary%20Light%20BG.svg"
-            alt="ACKO"
-            className="h-8 w-auto"
-          />
-          <div className="h-6 w-px shrink-0 bg-onyx-300" aria-hidden />
-          <span className="text-base font-semibold tracking-tight text-onyx-800">
-            OMNI Pre-sales
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3">
+      <AppHeader
+        right={
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-200">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
@@ -699,8 +687,8 @@ const CrmView2 = () => {
             </span>
             <span className="text-xs font-semibold text-green-800">On Call</span>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Phase III only — live call captions (closed-caption style) */}
       {phase === "phase3" && phase3Mode === "listen" && (
