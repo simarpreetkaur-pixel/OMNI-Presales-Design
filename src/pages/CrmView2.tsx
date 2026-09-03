@@ -7,8 +7,6 @@ import {
   CreditCard,
   Building2,
   MapPin,
-  ArrowRight,
-  Plus,
   Scale,
   Stethoscope,
   CalendarDays,
@@ -808,53 +806,6 @@ const CrmView2 = () => {
                     </span>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Container 3: Ongoing Quote + Create New Quote */}
-            <div className="rounded-xl border border-onyx-300 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold tracking-wide text-[#5B5675] uppercase">
-                  Ongoing Quote
-                </p>
-                <button
-                  className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                  onClick={() => {
-                    if (isToolPhase) {
-                      setQuoteBuilderOpen(true);
-                    } else {
-                      window.open("/lead-360", "_blank");
-                    }
-                  }}
-                >
-                  <Plus className="h-3 w-3" />
-                  Create New
-                </button>
-              </div>
-              <div className="h-px bg-border" />
-              <div className="rounded-lg p-4 space-y-1" style={{ backgroundColor: "rgba(239, 233, 251, 0.6)" }}>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-base font-medium truncate" style={{ color: "#36354C" }}>
-                    {phase === "phase3" ? "Family Floater Plan" : isPooja ? "Platinum Lite Plan" : "Zero Dep Plan"}
-                  </span>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {phase === "phase3" ? "Jul 31 2026" : isPooja ? "Feb 07 2026" : "Feb 10 2026"}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground truncate">
-                  {phase === "phase3"
-                    ? "Self + Mother · Payment pending"
-                    : isPooja
-                      ? "Family Floater · 10L Cover"
-                      : "Honda Amaze 2025"}
-                </p>
-                <button
-                  onClick={() => isToolPhase ? setQuoteBuilderOpen(true) : window.open("/lead-360", "_blank")}
-                  className="flex items-center gap-1 text-sm font-medium text-primary mt-1 hover:underline"
-                >
-                  Resume Quote
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </button>
               </div>
             </div>
           </div>
