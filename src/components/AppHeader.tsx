@@ -10,7 +10,10 @@ type AppHeaderProps = {
 /** Matches the main OMNI Sales top nav: 60px, ACKO logo, OMNI Sales. */
 const AppHeader = ({ right }: AppHeaderProps) => {
   return (
-    <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-onyx-300 bg-card px-10 shadow-[0px_2px_5px_rgba(0,0,0,0.08)]">
+    <header
+      data-build="v1-cues"
+      className="flex h-[60px] shrink-0 items-center justify-between border-b border-onyx-300 bg-card px-10 shadow-[0px_2px_5px_rgba(0,0,0,0.08)]"
+    >
       <div className="flex items-center gap-3.5">
         <img src={ACKO_LOGO} alt="ACKO" className="h-9 w-auto" />
         <div className="h-[26px] w-px shrink-0 bg-onyx-300" aria-hidden />
