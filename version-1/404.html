@@ -6,7 +6,9 @@
     <script>
       // GitHub Pages SPA redirect: encode the path into a query string so
       // index.html can restore it via history.replaceState.
-      var segmentsToKeep = 1; // number of path segments in the repo name
+      var parts = window.location.pathname.split("/").filter(Boolean);
+      // Keep repo name, plus "version-1" so nested Pages URLs load that app.
+      var segmentsToKeep = parts[1] === "version-1" ? 2 : 1;
       var l = window.location;
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
