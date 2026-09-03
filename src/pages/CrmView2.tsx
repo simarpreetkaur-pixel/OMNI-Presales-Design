@@ -707,13 +707,21 @@ const CrmView2 = () => {
     <div className="h-screen flex flex-col bg-background">
       <AppHeader
         right={
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-200">
+          <button
+            type="button"
+            className="flex items-center gap-2 rounded-full bg-green-200 px-3 py-1.5 transition-colors hover:bg-green-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-green-200"
+            aria-label="End call"
+            onClick={() => {
+              setOzontelOpen(false);
+              setPostCallSecondsRemaining(30);
+            }}
+          >
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-600" />
             </span>
             <span className="text-xs font-semibold text-green-800">On Call</span>
-          </div>
+          </button>
         }
       />
 
