@@ -1238,7 +1238,7 @@ const CrmView2 = () => {
         )}
 
         {phase === "phase1" && (
-          <div className={rightRail === "notes" ? "min-h-0" : "hidden"}>
+          <div className={rightRail === "notes" ? "min-h-0 h-full" : "hidden"}>
             <AgentNotesPanel />
           </div>
         )}
