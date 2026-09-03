@@ -17,6 +17,7 @@ import {
   Check,
   Sparkles,
   Wrench,
+  ClipboardList,
   Infinity as InfinityIcon,
   ChevronDown,
   Radio,
@@ -53,6 +54,7 @@ import Phase3NextBestActions, {
 import Phase3CallCaptionRibbon from "@/components/Phase3CallCaptionRibbon";
 import ackoFabIcon from "@/assets/acko-fab-icon.png";
 import AppHeader from "@/components/AppHeader";
+import AgentNotesPanel from "@/components/AgentNotesPanel";
 
 type Phase3Mode = "listen" | "agent";
 
@@ -307,6 +309,7 @@ const CrmView2 = () => {
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
   const [rightPanelExpanded, setRightPanelExpanded] = useState(true);
+  const [rightRail, setRightRail] = useState<"tools" | "notes">("tools");
   /** Phase II/III: which right-rail tool is open; null = panel closed */
   const [activeRightTool, setActiveRightTool] = useState<RightTool | null>(null);
   const isToolPhase = phase === "phase2" || phase === "phase3";
@@ -709,7 +712,9 @@ const CrmView2 = () => {
       <div className={cn(
         "flex-1 grid overflow-hidden transition-all duration-300 relative",
         phase === "phase1"
-          ? rightPanelExpanded
+          ? rightRail === "notes"
+            ? "grid-cols-[328px_1fr_303px_63px]"
+            : rightPanelExpanded
             ? "grid-cols-[328px_1fr_260px_63px]"
             : "grid-cols-[328px_1fr_63px]"
           : quoteBuilderOpen
@@ -1232,8 +1237,14 @@ const CrmView2 = () => {
           />
         )}
 
+        {phase === "phase1" && (
+          <div className={rightRail === "notes" ? "min-h-0" : "hidden"}>
+            <AgentNotesPanel />
+          </div>
+        )}
+
         {/* Phase I — Power Tools expanded list */}
-        {phase === "phase1" && rightPanelExpanded && (
+        {phase === "phase1" && rightRail === "tools" && rightPanelExpanded && (
           <aside className="bg-white shadow-[-2px_0_4px_rgba(0,0,0,0.09)] z-[1] flex flex-col overflow-y-auto">
             <div className="p-6 w-full">
               <div className="flex flex-col gap-3 w-full">
@@ -1281,40 +1292,74 @@ const CrmView2 = () => {
         {/* Right strip */}
         {phase === "phase1" ? (
           <aside
-            role="button"
-            tabIndex={0}
-            aria-expanded={rightPanelExpanded}
-            aria-label={rightPanelExpanded ? "Collapse Power tools" : "Expand Power tools"}
-            onClick={() => setRightPanelExpanded((prev) => !prev)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setRightPanelExpanded((prev) => !prev);
-              }
-            }}
-            className="group relative z-[2] w-[63px] min-w-[63px] bg-white border-l border-[#e7e7f0] shadow-none flex flex-col items-center pt-4 gap-1.5 cursor-pointer select-none"
+            className="relative z-[2] flex w-[63px] min-w-[63px] select-none flex-col items-center gap-6 border-l border-[#e7e7f0] bg-white pt-4 shadow-none"
+            aria-label="Workspace tools"
           >
-            <div
-              className={cn(
-                "flex size-8 items-center justify-center rounded-lg shrink-0 transition-colors duration-150",
-                rightPanelExpanded
-                  ? "bg-[#f8f7fc]"
-                  : "bg-transparent group-hover:bg-[#f8f7fc]"
-              )}
+            <button
+              type="button"
+              aria-pressed={rightRail === "tools" && rightPanelExpanded}
+              aria-label="Power tools"
+              className="group flex cursor-pointer flex-col items-center gap-1.5"
+              onClick={() => {
+                if (rightRail === "tools") {
+                  setRightPanelExpanded((prev) => !prev);
+                  return;
+                }
+                setRightRail("tools");
+                setRightPanelExpanded(true);
+              }}
             >
-              <Wrench
+              <div
                 className={cn(
-                  "size-5 text-[#5b5675] transition-[fill] duration-150",
-                  rightPanelExpanded
-                    ? "fill-[#5b5675]"
-                    : "fill-transparent group-hover:fill-[#5b5675]"
+                  "flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-150",
+                  rightRail === "tools" && rightPanelExpanded
+                    ? "bg-[#f8f7fc]"
+                    : "bg-transparent group-hover:bg-[#f8f7fc]"
                 )}
-                strokeWidth={1.75}
-              />
-            </div>
-            <span className="mt-1 text-[10px] font-medium leading-[1.3] text-[#5b5675] text-center w-[39px]">
-              Power tools
-            </span>
+              >
+                <Wrench
+                  className={cn(
+                    "size-5 text-[#5b5675] transition-[fill] duration-150",
+                    rightRail === "tools" && rightPanelExpanded
+                      ? "fill-[#5b5675]"
+                      : "fill-transparent group-hover:fill-[#5b5675]"
+                  )}
+                  strokeWidth={1.75}
+                />
+              </div>
+              <span className="w-[39px] text-center text-[10px] font-medium leading-[1.3] text-[#5b5675]">
+                Power tools
+              </span>
+            </button>
+            <button
+              type="button"
+              aria-pressed={rightRail === "notes"}
+              aria-label="Agent notes"
+              className="group flex cursor-pointer flex-col items-center gap-1.5"
+              onClick={() => setRightRail("notes")}
+            >
+              <div
+                className={cn(
+                  "flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-150",
+                  rightRail === "notes"
+                    ? "bg-[#f8f7fc]"
+                    : "bg-transparent group-hover:bg-[#f8f7fc]"
+                )}
+              >
+                <ClipboardList
+                  className={cn(
+                    "size-5 text-[#5b5675] transition-[fill] duration-150",
+                    rightRail === "notes"
+                      ? "fill-[#5b5675]"
+                      : "fill-transparent group-hover:fill-[#5b5675]"
+                  )}
+                  strokeWidth={1.75}
+                />
+              </div>
+              <span className="w-[39px] text-center text-[10px] font-medium leading-[1.3] text-[#5b5675]">
+                Agent notes
+              </span>
+            </button>
           </aside>
         ) : (
           <aside
