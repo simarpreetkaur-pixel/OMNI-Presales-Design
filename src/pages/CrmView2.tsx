@@ -29,13 +29,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -305,7 +298,7 @@ const CrmView2 = () => {
   const customer = (location.state as { customer?: string } | null)?.customer;
   const isPooja = customer === "pooja";
   const isRajesh2 = customer === "rajesh2";
-  const [phase, setPhase] = useState<"phase1" | "phase2" | "phase3">("phase1");
+  const phase = "phase2" as const;
   const [inputValue, setInputValue] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [ctasVisible, setCtasVisible] = useState(false);
@@ -696,16 +689,6 @@ const CrmView2 = () => {
           <span className="text-base font-semibold tracking-tight text-onyx-800">
             OMNI Pre-sales
           </span>
-          <Select value={phase} onValueChange={(v) => setPhase(v as "phase1" | "phase2" | "phase3")}>
-            <SelectTrigger className="w-[130px] h-9 rounded-lg border-onyx-300 text-sm font-medium">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="phase1">Phase I</SelectItem>
-              <SelectItem value="phase2">Phase II</SelectItem>
-              <SelectItem value="phase3">Phase III</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <div className="flex items-center gap-3">
