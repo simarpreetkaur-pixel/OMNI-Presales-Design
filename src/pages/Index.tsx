@@ -9,7 +9,6 @@ import callbackIllustration from "@/assets/callback-illustration.png";
 import OutgoingCallModal2 from "@/components/OutgoingCallModal2";
 import OutgoingCallModal3 from "@/components/OutgoingCallModal3";
 import IncomingCallModal2 from "@/components/IncomingCallModal2";
-import ScheduledFollowUpsDashboard from "@/components/FigmaScheduledFollowUpsDashboard";
 
 const Index = () => {
   const location = useLocation();
@@ -32,32 +31,44 @@ const Index = () => {
   }, [location.state]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background">
-      {/* Top Navigation Bar — Figma: h 72, px 40 */}
-      <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-onyx-300 bg-card px-10 shadow-[0px_2px_5px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center gap-3.5">
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Top Navigation Bar — ACKO spacing: px-6 (24px), nav height 56px */}
+      <header className="h-14 shrink-0 flex items-center justify-between border-b border-onyx-300 bg-card px-6">
+        <div className="flex items-center gap-4">
           <img
             src="https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/ACKO%20logo%20primary%20Light%20BG.svg"
             alt="ACKO"
-            className="h-9 w-auto"
+            className="h-8 w-auto"
           />
-          <div className="h-[26px] w-px shrink-0 bg-onyx-300" aria-hidden />
-          <span className="text-[28px] font-normal leading-[1.2] tracking-tight text-[#2c2067]">
-            OMNI Sales
+          <div className="h-6 w-px shrink-0 bg-onyx-300" aria-hidden />
+          <span className="text-base font-semibold tracking-tight text-onyx-800">
+            OMNI Pre-sales
           </span>
         </div>
       </header>
 
       {/* Main Content Area */}
       <main
-        className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
+        className="flex-1 relative flex items-center justify-center"
         style={{
           backgroundImage: `url(${bgGradient})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        <ScheduledFollowUpsDashboard />
+        <div className="mx-auto max-w-2xl px-6 text-center">
+          <div className="mb-6 text-[4.5rem] leading-none" aria-hidden>
+            👋
+          </div>
+          <h1 className="text-[32px] font-semibold leading-[1.2] tracking-tight text-onyx-800 sm:text-[40px]">
+            Hello, Welcome to{" "}
+            <span className="text-primary">OMNI Pre-sales</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-xl text-base font-normal leading-relaxed text-onyx-500">
+            An AI-powered, context-driven CRM that equips agents with real-time insights and
+            guided actions to drive smarter, faster conversions.
+          </p>
+        </div>
 
         {/* ACKO FAB - Bottom Left */}
         <Button
