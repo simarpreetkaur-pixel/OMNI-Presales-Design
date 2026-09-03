@@ -299,7 +299,8 @@ const CrmView2 = () => {
   const customer = (location.state as { customer?: string } | null)?.customer;
   const isPooja = customer === "pooja";
   const isRajesh2 = customer === "rajesh2";
-  const phase = "phase2" as const;
+  // Version-1 uses the main branch's original CRM workspace without exposing phase controls.
+  const phase = "phase1" as const;
   const [inputValue, setInputValue] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [ctasVisible, setCtasVisible] = useState(false);
