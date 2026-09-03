@@ -56,7 +56,7 @@ const DNDConfirmModal = ({
         {/* Actions */}
         <div className="flex flex-col items-center gap-4">
           <Button
-            className="w-full h-14 rounded-[16px] text-[16px] font-medium bg-[#7c47e1] hover:bg-[#5920c5] text-white"
+            className="w-full h-14 rounded-[16px] text-[14px] font-medium bg-[#7c47e1] hover:bg-[#5920c5] text-white"
             onClick={handleConfirm}
           >
             Yes, continue

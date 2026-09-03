@@ -82,7 +82,7 @@ const NotInterestedChecklistModal = ({
               <span className="text-[18px] font-semibold leading-6 text-[#36354c]">
                 Disposition checklist
               </span>
-              <span className="text-[16px] font-normal leading-6 text-[#5b5675]">
+              <span className="text-[14px] font-normal leading-6 text-[#5b5675]">
                 {customerName} • {product}
               </span>
             </div>
@@ -91,7 +91,7 @@ const NotInterestedChecklistModal = ({
 
         {/* Content */}
         <div className="px-6 pt-5 pb-0 bg-white">
-          <p className="text-[16px] font-normal text-[#5b5675] mb-3">
+          <p className="text-[14px] font-normal text-[#5b5675] mb-3">
             Ensure you've asked these questions
           </p>
           <div className="flex flex-col gap-3">
@@ -115,7 +115,7 @@ const NotInterestedChecklistModal = ({
                   )}
                 />
                 <p className={cn(
-                  "text-[16px] font-medium leading-6 transition-colors",
+                  "text-[14px] font-medium leading-6 transition-colors",
                   checked[index] ? "text-[#5b5675]" : "text-[#36354c]"
                 )}>
                   {question}
@@ -128,7 +128,7 @@ const NotInterestedChecklistModal = ({
         {/* Footer CTAs */}
         <div className="px-[64px] py-6 flex flex-col items-center gap-4 bg-white">
           <Button
-            className="w-full h-14 rounded-[16px] text-[16px] font-medium bg-[#7c47e1] hover:bg-[#5920c5] text-white"
+            className="w-full h-14 rounded-[16px] text-[14px] font-medium bg-[#7c47e1] hover:bg-[#5920c5] text-white"
             onClick={handleMarkNotInterested}
           >
             Mark as not interested

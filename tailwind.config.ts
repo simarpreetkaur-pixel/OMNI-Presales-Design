@@ -16,6 +16,9 @@ export default {
       fontFamily: {
         sans: ["'Euclid Circular B'", "sans-serif"],
       },
+      fontSize: {
+        base: ["14px", { lineHeight: "1.5" }],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

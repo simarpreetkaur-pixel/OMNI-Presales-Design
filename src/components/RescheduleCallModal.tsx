@@ -268,7 +268,7 @@ const RescheduleCallModal = ({
               <span className="text-[18px] font-semibold leading-6 text-[#36354c]">
                 Re-schedule Call
               </span>
-              <span className="text-[16px] font-normal leading-6 text-[#5b5675] truncate">
+              <span className="text-[14px] font-normal leading-6 text-[#5b5675] truncate">
                 {customerName} • {product}
               </span>
             </div>
@@ -422,7 +422,7 @@ const RescheduleCallModal = ({
         <div className="px-8 pb-6 pt-4 bg-white">
           <Button
             className={cn(
-              "w-full h-14 rounded-[16px] text-[16px] font-medium text-white transition-all",
+              "w-full h-14 rounded-[16px] text-[14px] font-medium text-white transition-all",
               canConfirm
                 ? "bg-[#7c47e1] hover:bg-[#5920c5]"
                 : "bg-[#7c47e1]/60 cursor-not-allowed"
