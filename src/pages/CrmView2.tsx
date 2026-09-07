@@ -61,6 +61,7 @@ import Phase3NextBestActions, {
 } from "@/components/Phase3AgentFeed";
 import Phase3CallCaptionRibbon from "@/components/Phase3CallCaptionRibbon";
 import ackoFabIcon from "@/assets/acko-fab-icon.png";
+import AutoScaleLeftPane from "@/components/AutoScaleLeftPane";
 
 type Phase3Mode = "listen" | "agent";
 
@@ -305,6 +306,7 @@ const CrmView2 = () => {
   const customer = (location.state as { customer?: string } | null)?.customer;
   const isPooja = customer === "pooja";
   const isRajesh2 = customer === "rajesh2";
+  const isAutoScale = customer === "autoscale";
   const [phase, setPhase] = useState<"phase1" | "phase2" | "phase3">("phase1");
   const [inputValue, setInputValue] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -696,16 +698,18 @@ const CrmView2 = () => {
           <span className="text-base font-semibold tracking-tight text-onyx-800">
             OMNI Pre-sales
           </span>
-          <Select value={phase} onValueChange={(v) => setPhase(v as "phase1" | "phase2" | "phase3")}>
-            <SelectTrigger className="w-[130px] h-9 rounded-lg border-onyx-300 text-sm font-medium">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="phase1">Phase I</SelectItem>
-              <SelectItem value="phase2">Phase II</SelectItem>
-              <SelectItem value="phase3">Phase III</SelectItem>
-            </SelectContent>
-          </Select>
+          {!isAutoScale && (
+            <Select value={phase} onValueChange={(v) => setPhase(v as "phase1" | "phase2" | "phase3")}>
+              <SelectTrigger className="w-[130px] h-9 rounded-lg border-onyx-300 text-sm font-medium">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="phase1">Phase I</SelectItem>
+                <SelectItem value="phase2">Phase II</SelectItem>
+                <SelectItem value="phase3">Phase III</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
@@ -756,6 +760,9 @@ const CrmView2 = () => {
       )}>
         {/* Left Pane -- Customer Data */}
         <aside className="relative bg-card shadow-[2px_0_12px_rgba(0,0,0,0.06)] z-10 flex flex-col overflow-hidden">
+          {isAutoScale ? (
+            <AutoScaleLeftPane />
+          ) : (
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
             {/* Container 1: Customer Details */}
             <div className="rounded-xl border border-onyx-300 p-4 space-y-3">
@@ -886,7 +893,7 @@ const CrmView2 = () => {
               </div>
             </div>
           </div>
-
+          )}
         </aside>
 
         {/* Left pane collapse toggle (Phase II / III) */}

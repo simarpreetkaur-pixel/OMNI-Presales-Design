@@ -11,9 +11,14 @@ import DNDConfirmModal from "@/components/DNDConfirmModal";
 interface OutgoingCallModal2Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  customer?: "rajesh" | "autoscale";
 }
 
-const OutgoingCallModal2 = ({ open, onOpenChange }: OutgoingCallModal2Props) => {
+const OutgoingCallModal2 = ({
+  open,
+  onOpenChange,
+  customer = "rajesh",
+}: OutgoingCallModal2Props) => {
   const [isConnected, setIsConnected] = useState(false);
   const [timer, setTimer] = useState(0);
   const [showReschedule, setShowReschedule] = useState(false);
@@ -161,7 +166,7 @@ const OutgoingCallModal2 = ({ open, onOpenChange }: OutgoingCallModal2Props) => 
             <Button
               className="rounded-xl h-12 flex-1 text-sm font-medium bg-[#7c47e1] border-[#7c47e1] hover:bg-[#5920c5] text-white"
               disabled={!isConnected}
-              onClick={() => { onOpenChange(false); navigate("/crm2", { state: { customer: "rajesh" } }); }}>
+              onClick={() => { onOpenChange(false); navigate("/crm2", { state: { customer } }); }}>
               Continue
             </Button>
           </div>

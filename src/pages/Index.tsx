@@ -15,6 +15,7 @@ const Index = () => {
   const location = useLocation();
   const [showCallOptions, setShowCallOptions] = useState(false);
   const [showOutgoingCall2, setShowOutgoingCall2] = useState(false);
+  const [showAutoScaleCall, setShowAutoScaleCall] = useState(false);
   const [showOutgoingCall3, setShowOutgoingCall3] = useState(false);
   const [showIncomingCall2, setShowIncomingCall2] = useState(false);
   const [showCallbackConfirm, setShowCallbackConfirm] = useState(false);
@@ -76,6 +77,20 @@ const Index = () => {
                 variant="outline"
                 className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
                 onClick={() => {
+                  setShowAutoScaleCall(true);
+                  setShowCallOptions(false);
+                }}
+              >
+                <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold leading-tight text-onyx-800">Auto scale-up</p>
+                  <p className="text-xs font-normal text-onyx-500">Outgoing call</p>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
+                onClick={() => {
                   setShowOutgoingCall2(true);
                   setShowCallOptions(false);
                 }}
@@ -128,6 +143,11 @@ const Index = () => {
       </main>
 
       <OutgoingCallModal2 open={showOutgoingCall2} onOpenChange={setShowOutgoingCall2} />
+      <OutgoingCallModal2
+        open={showAutoScaleCall}
+        onOpenChange={setShowAutoScaleCall}
+        customer="autoscale"
+      />
       <OutgoingCallModal3 open={showOutgoingCall3} onOpenChange={setShowOutgoingCall3} />
       <IncomingCallModal2 open={showIncomingCall2} onOpenChange={setShowIncomingCall2} />
 
