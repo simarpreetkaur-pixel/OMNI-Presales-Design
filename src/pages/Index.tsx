@@ -1,22 +1,18 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Phone, PhoneOutgoing, PhoneIncoming } from "lucide-react";
+import { Phone, PhoneOutgoing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import bgGradient from "@/assets/bg-gradient.png";
 import ackoFabIcon from "@/assets/acko-fab-icon.png";
 import callbackIllustration from "@/assets/callback-illustration.png";
 import OutgoingCallModal2 from "@/components/OutgoingCallModal2";
-import OutgoingCallModal3 from "@/components/OutgoingCallModal3";
-import IncomingCallModal2 from "@/components/IncomingCallModal2";
 import ScheduledFollowUpsDashboard from "@/components/FigmaScheduledFollowUpsDashboard";
 
 const Index = () => {
   const location = useLocation();
   const [showCallOptions, setShowCallOptions] = useState(false);
   const [showOutgoingCall2, setShowOutgoingCall2] = useState(false);
-  const [showOutgoingCall3, setShowOutgoingCall3] = useState(false);
-  const [showIncomingCall2, setShowIncomingCall2] = useState(false);
   const [showCallbackConfirm, setShowCallbackConfirm] = useState(false);
 
   useEffect(() => {
@@ -71,50 +67,20 @@ const Index = () => {
         {/* Simulate Call FAB - Bottom Right */}
         <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3">
           {showCallOptions && (
-            <>
-              <Button
-                variant="outline"
-                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
-                onClick={() => {
-                  setShowOutgoingCall2(true);
-                  setShowCallOptions(false);
-                }}
-              >
-                <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
-                <div className="text-left">
-                  <p className="text-sm font-semibold leading-tight text-onyx-800">Rajesh Kumar</p>
-                  <p className="text-xs font-normal text-onyx-500">Outgoing call</p>
-                </div>
-              </Button>
-              <Button
-                variant="outline"
-                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
-                onClick={() => {
-                  setShowOutgoingCall3(true);
-                  setShowCallOptions(false);
-                }}
-              >
-                <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
-                <div className="text-left">
-                  <p className="text-sm font-semibold leading-tight text-onyx-800">Rajesh Kumar 2</p>
-                  <p className="text-xs font-normal text-onyx-500">Outgoing call</p>
-                </div>
-              </Button>
-              <Button
-                variant="outline"
-                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
-                onClick={() => {
-                  setShowIncomingCall2(true);
-                  setShowCallOptions(false);
-                }}
-              >
-                <PhoneIncoming className="h-5 w-5 shrink-0 text-primary" />
-                <div className="text-left">
-                  <p className="text-sm font-semibold leading-tight text-onyx-800">Pooja Arora</p>
-                  <p className="text-xs font-normal text-onyx-500">Incoming call</p>
-                </div>
-              </Button>
-            </>
+            <Button
+              variant="outline"
+              className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
+              onClick={() => {
+                setShowOutgoingCall2(true);
+                setShowCallOptions(false);
+              }}
+            >
+              <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
+              <div className="text-left">
+                <p className="text-sm font-semibold leading-tight text-onyx-800">Rajesh Kumar</p>
+                <p className="text-xs font-normal text-onyx-500">Outgoing call</p>
+              </div>
+            </Button>
           )}
           <Button
             size="default"
@@ -128,8 +94,6 @@ const Index = () => {
       </main>
 
       <OutgoingCallModal2 open={showOutgoingCall2} onOpenChange={setShowOutgoingCall2} />
-      <OutgoingCallModal3 open={showOutgoingCall3} onOpenChange={setShowOutgoingCall3} />
-      <IncomingCallModal2 open={showIncomingCall2} onOpenChange={setShowIncomingCall2} />
 
       <Dialog open={showCallbackConfirm} onOpenChange={setShowCallbackConfirm}>
         <DialogContent className="gap-0 rounded-[24px] border-onyx-300 p-8 text-center shadow-xl sm:max-w-[380px]">
