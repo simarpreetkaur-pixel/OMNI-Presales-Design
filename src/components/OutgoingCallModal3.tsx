@@ -153,7 +153,10 @@ const OutgoingCallModal3 = ({ open, onOpenChange }: OutgoingCallModal3Props) => 
       <RescheduleCallModal
         open={showReschedule}
         onOpenChange={setShowReschedule}
-        onBack={() => { setShowReschedule(false); onOpenChange(true); }} />
+        onBack={() => { setShowReschedule(false); onOpenChange(true); }}
+        customerName="Rajesh Kumar 2"
+        restrictedFollowUp
+      />
 
       <NotInterestedChecklistModal
         open={showNotInterested}

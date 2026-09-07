@@ -1507,6 +1507,8 @@ const CrmView2 = () => {
           setRescheduleOpen(false);
           setReschedulePreset(null);
         }}
+        customerName={isRajesh2 ? "Rajesh Kumar 2" : undefined}
+        restrictedFollowUp={isRajesh2}
         product={phase === "phase3" ? "Family_Floater_Health" : undefined}
         preset={reschedulePreset}
         onConfirm={(date, time) => setScheduledTime({ date, time })}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +9,7 @@ import {
   Sun,
   Sunset,
   CheckCircle2,
+  Clock3,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -19,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -37,6 +39,8 @@ interface RescheduleCallModalProps {
   onBack: () => void;
   customerName?: string;
   product?: string;
+  /** Enables the Rajesh Kumar 2 scheduling-window prototype. */
+  restrictedFollowUp?: boolean;
   onConfirm?: (date: string, time: string) => void;
   preset?: ReschedulePreset | null;
 }
@@ -69,6 +73,36 @@ const slotForHour = (h: number): TimeSlot => {
   return "evening";
 };
 
+const WINDOW_TOOLTIP = "Follow-up can only be scheduled until tomorrow 11:00 AM";
+
+function FlexTooltip({
+  show,
+  children,
+  collisionBoundary,
+}: {
+  show: boolean;
+  children: ReactElement;
+  collisionBoundary?: HTMLElement | null;
+}) {
+  const wrapped = <span className="flex min-w-0 flex-1 [&>*]:w-full">{children}</span>;
+  if (!show) return wrapped;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{wrapped}</TooltipTrigger>
+      <TooltipContent
+        side="bottom"
+        align="center"
+        sideOffset={8}
+        collisionPadding={16}
+        collisionBoundary={collisionBoundary ?? undefined}
+        className="z-[100] max-w-[min(308px,calc(var(--radix-popper-available-width,308px)))] overflow-visible whitespace-normal break-words rounded-md border-0 bg-[#040222] px-3 py-1.5 text-center text-xs font-normal leading-4 text-white shadow-none"
+      >
+        {WINDOW_TOOLTIP}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 const bookedSlots = new Set([
   "9:15am", "10:30am", "12:00pm", "1:45pm",
   "3:30pm", "4:15pm", "5:30pm", "6:45pm", "7:15pm",
@@ -99,6 +133,7 @@ const RescheduleCallModal = ({
   onBack,
   customerName = "Rajesh Kumar",
   product = "Car_Comprehensive",
+  restrictedFollowUp = false,
   onConfirm,
   preset = null,
 }: RescheduleCallModalProps) => {
@@ -115,6 +150,8 @@ const RescheduleCallModal = ({
   const [selectedSlot, setSelectedSlot]  = useState<TimeSlot>(defaultSlot);
   const [selectedExactTime, setSelectedExactTime] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage]   = useState<string>("");
+  const [iteration, setIteration] = useState<"iteration1" | "iteration2">("iteration1");
+  const [modalNode, setModalNode] = useState<HTMLDivElement | null>(null);
 
   const today = new Date();
 
@@ -155,8 +192,27 @@ const RescheduleCallModal = ({
   const dateLabel = selectedDate ? getDateLabel(selectedDate) : null;
   const dateFriendlyLabel = selectedDate ? getDateFriendlyLabel(selectedDate) : null;
   const canConfirm = selectedDate !== null;
+  const showSchedulingNudge = restrictedFollowUp && iteration === "iteration2";
+  const isDateDisabled = (option: DateOption) =>
+    restrictedFollowUp && (option === "dayAfter" || option === "custom");
+  const isTimeDisabled = (hour24: number, label?: string) =>
+    restrictedFollowUp &&
+    selectedDate === "tomorrow" &&
+    (hour24 > 11 || (hour24 === 11 && label !== "11:00am"));
+  const isSlotDisabled = (slot: TimeSlot) =>
+    restrictedFollowUp && selectedDate === "tomorrow" && slot !== "morning";
+
+  useEffect(() => {
+    if (!restrictedFollowUp || selectedDate !== "tomorrow") return;
+    if (isSlotDisabled(selectedSlot)) setSelectedSlot("morning");
+    if (selectedExactTime) {
+      const chip = exactTimes15.find((c) => c.label === selectedExactTime);
+      if (chip && isTimeDisabled(chip.hour24, chip.label)) setSelectedExactTime("");
+    }
+  }, [restrictedFollowUp, selectedDate, selectedSlot, selectedExactTime]);
 
   const handleSlotSelect = (id: TimeSlot) => {
+    if (isSlotDisabled(id)) return;
     if (selectedSlot === id) return;
     setSelectedSlot(id);
     if (selectedExactTime) {
@@ -169,6 +225,7 @@ const RescheduleCallModal = ({
   };
 
   const handleChipSelect = (label: string, hour24: number) => {
+    if (isTimeDisabled(hour24, label)) return;
     if (selectedExactTime === label) {
       setSelectedExactTime("");
       return;
@@ -248,7 +305,11 @@ const RescheduleCallModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-[552px] p-0 gap-0 overflow-hidden border-border shadow-xl rounded-[24px] [&>button:last-child]:hidden">
+      <DialogContent
+        ref={setModalNode}
+        className="w-full max-w-[552px] p-0 gap-0 overflow-visible border-border shadow-xl rounded-[24px] [&>button:last-child]:hidden"
+      >
+        <TooltipProvider delayDuration={0} skipDelayDuration={0}>
         <DialogTitle className="sr-only">Re-schedule Call</DialogTitle>
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
@@ -273,63 +334,92 @@ const RescheduleCallModal = ({
               </span>
             </div>
           </div>
+          {restrictedFollowUp && (
+            <Select value={iteration} onValueChange={(value) => setIteration(value as typeof iteration)}>
+              <SelectTrigger className="h-9 w-[118px] shrink-0 rounded-lg border-[#e7e7f0] text-sm font-medium text-[#36354c]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="iteration1">Iteration 1</SelectItem>
+                <SelectItem value="iteration2">Iteration 2</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
         {/* ── Body ───────────────────────────────────────────────────────── */}
         <div className="flex flex-col gap-5 px-[25px] py-5 bg-white overflow-y-auto max-h-[500px]">
+          {showSchedulingNudge && (
+            <div className="flex items-center gap-1.5 rounded-xl border border-[#ffab00] bg-[#fff7e5] px-3 py-2.5">
+              <Clock3 className="h-4 w-4 shrink-0 text-[#d16900]" />
+              <p className="text-sm leading-5 text-[#5b5675]">{WINDOW_TOOLTIP}</p>
+            </div>
+          )}
 
           {/* Select Date */}
           <div className="flex flex-col gap-3">
             <span className="text-[14px] font-normal text-[#5b5675]">Select Date</span>
             <div className="flex gap-[10px]">
-              {(["today", "tomorrow", "dayAfter"] as DateOption[]).map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => setSelectedDate(opt)}
-                  className={cn(
-                    "flex-1 px-3 py-2.5 rounded-[12px] border text-[14px] font-medium transition-colors",
-                    selectedDate === opt
-                      ? "bg-[#efe9fb] border-[#7c47e1] text-[#36354c]"
-                      : "border-[#e7e7f0] text-[#36354c] hover:border-[#7c47e1]/50"
-                  )}
-                >
-                  {opt === "today" ? "Today" : opt === "tomorrow" ? "Tomorrow" : "Day After"}
-                </button>
-              ))}
+              {(["today", "tomorrow", "dayAfter"] as DateOption[]).map((opt) => {
+                const windowOff = isDateDisabled(opt);
+                return (
+                  <FlexTooltip key={opt} show={windowOff && iteration === "iteration1"} collisionBoundary={modalNode}>
+                    <button
+                      type="button"
+                      aria-disabled={windowOff}
+                      onClick={() => { if (!windowOff) setSelectedDate(opt); }}
+                      className={cn(
+                        "flex-1 px-3 py-2.5 rounded-[12px] border text-[14px] font-medium transition-colors",
+                        selectedDate === opt
+                          ? "bg-[#efe9fb] border-[#7c47e1] text-[#36354c]"
+                          : "border-[#e7e7f0] text-[#36354c] hover:border-[#7c47e1]/50",
+                        windowOff && "pointer-events-none cursor-not-allowed opacity-50"
+                      )}
+                    >
+                      {opt === "today" ? "Today" : opt === "tomorrow" ? "Tomorrow" : "Day After"}
+                    </button>
+                  </FlexTooltip>
+                );
+              })}
 
-              <Popover open={customCalOpen} onOpenChange={setCustomCalOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    onClick={() => setCustomCalOpen(true)}
-                    className={cn(
-                      "flex-1 flex items-center justify-center gap-1 px-2 py-2.5 rounded-[12px] border text-[14px] font-medium transition-colors",
-                      selectedDate === "custom"
-                        ? "bg-[#efe9fb] border-[#7c47e1] text-[#36354c]"
-                        : "border-[#e7e7f0] text-[#36354c] hover:border-[#7c47e1]/50"
-                    )}
-                  >
-                    <CalendarDays className="h-4 w-4 shrink-0" />
-                    <span className="whitespace-nowrap">
-                      {selectedDate === "custom" && customDate
-                        ? format(customDate, "dd MMM")
-                        : "Custom"}
-                    </span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <Calendar
-                    mode="single"
-                    selected={customDate}
-                    onSelect={(date) => {
-                      setCustomDate(date);
-                      setSelectedDate("custom");
-                      setCustomCalOpen(false);
-                    }}
-                    disabled={(date) => date < today}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <FlexTooltip show={isDateDisabled("custom") && iteration === "iteration1"} collisionBoundary={modalNode}>
+                <Popover open={customCalOpen} onOpenChange={setCustomCalOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      aria-disabled={isDateDisabled("custom")}
+                      onClick={() => { if (!isDateDisabled("custom")) setCustomCalOpen(true); }}
+                      className={cn(
+                        "flex w-full items-center justify-center gap-1 px-2 py-2.5 rounded-[12px] border text-[14px] font-medium transition-colors",
+                        selectedDate === "custom"
+                          ? "bg-[#efe9fb] border-[#7c47e1] text-[#36354c]"
+                          : "border-[#e7e7f0] text-[#36354c] hover:border-[#7c47e1]/50",
+                        isDateDisabled("custom") && "pointer-events-none cursor-not-allowed opacity-50"
+                      )}
+                    >
+                      <CalendarDays className="h-4 w-4 shrink-0" />
+                      <span className="whitespace-nowrap">
+                        {selectedDate === "custom" && customDate
+                          ? format(customDate, "dd MMM")
+                          : "Custom"}
+                      </span>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <Calendar
+                      mode="single"
+                      selected={customDate}
+                      onSelect={(date) => {
+                        setCustomDate(date);
+                        setSelectedDate("custom");
+                        setCustomCalOpen(false);
+                      }}
+                      disabled={(date) => date < today}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </FlexTooltip>
             </div>
           </div>
 
@@ -337,26 +427,33 @@ const RescheduleCallModal = ({
           <div className="flex flex-col gap-3">
             <span className="text-[14px] font-normal text-[#5b5675]">Preferred Slot</span>
             <div className="flex gap-[10px]">
-              {timeSlots.map(({ id, label, range, Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => handleSlotSelect(id)}
-                  className={cn(
-                    "flex-1 flex flex-col items-center gap-2 py-3 rounded-[12px] border transition-colors",
-                    selectedSlot === id
-                      ? "border-[#7c47e1] bg-[#efe9fb]"
-                      : "border-[#e7e7f0] hover:border-[#7c47e1]/50"
-                  )}
-                >
-                  <div className="bg-[#fff7e5] p-2 rounded-[10px]">
-                    <Icon className="h-6 w-6 text-[#ffab00]" />
-                  </div>
-                  <div className="flex flex-col items-center gap-0.5">
-                    <span className="text-[14px] font-medium text-[#36354c] leading-5">{label}</span>
-                    <span className="text-[12px] font-medium text-[#5b5675] leading-4">{range}</span>
-                  </div>
-                </button>
-              ))}
+              {timeSlots.map(({ id, label, range, Icon }) => {
+                const windowOff = isSlotDisabled(id);
+                return (
+                  <FlexTooltip key={id} show={windowOff && iteration === "iteration1"} collisionBoundary={modalNode}>
+                    <button
+                      type="button"
+                      aria-disabled={windowOff}
+                      onClick={() => handleSlotSelect(id)}
+                      className={cn(
+                        "flex w-full flex-col items-center gap-2 py-3 rounded-[12px] border transition-colors",
+                        selectedSlot === id
+                          ? "border-[#7c47e1] bg-[#efe9fb]"
+                          : "border-[#e7e7f0] hover:border-[#7c47e1]/50",
+                        windowOff && "pointer-events-none cursor-not-allowed opacity-50"
+                      )}
+                    >
+                      <div className="bg-[#fff7e5] p-2 rounded-[10px]">
+                        <Icon className="h-6 w-6 text-[#ffab00]" />
+                      </div>
+                      <div className="flex flex-col items-center gap-0.5">
+                        <span className="text-[14px] font-medium text-[#36354c] leading-5">{label}</span>
+                        <span className="text-[12px] font-medium text-[#5b5675] leading-4">{range}</span>
+                      </div>
+                    </button>
+                  </FlexTooltip>
+                );
+              })}
             </div>
           </div>
 
@@ -372,21 +469,26 @@ const RescheduleCallModal = ({
                     </span>
                     {chips.map(({ label }) => {
                       const booked = bookedSlots.has(label);
+                      const windowOff = isTimeDisabled(hour24, label);
                       const chosen = selectedExactTime === label;
                       return (
-                        <button
-                          key={label}
-                          disabled={booked}
-                          onClick={() => !booked && handleChipSelect(label, hour24)}
-                          className={cn(
-                            "flex-1 h-10 flex items-center justify-center rounded-[10px] border text-[13px] font-medium transition-colors",
-                            chosen  && "bg-[#efe9fb] border-[#7c47e1] text-[#36354c]",
-                            booked  && "bg-[#f5f4fb] border-[#e7e7f0] text-[#c4c1d6] line-through cursor-not-allowed",
-                            !chosen && !booked && "border-[#e7e7f0] bg-white text-[#36354c] hover:border-[#7c47e1]/50"
-                          )}
-                        >
-                          {label}
-                        </button>
+                        <FlexTooltip key={label} show={windowOff && iteration === "iteration1"} collisionBoundary={modalNode}>
+                          <button
+                            type="button"
+                            disabled={booked}
+                            aria-disabled={windowOff || booked}
+                            onClick={() => !booked && !windowOff && handleChipSelect(label, hour24)}
+                            className={cn(
+                              "flex h-10 w-full items-center justify-center rounded-[10px] border text-[13px] font-medium transition-colors",
+                              chosen && !windowOff && "bg-[#efe9fb] border-[#7c47e1] text-[#36354c]",
+                              booked && "bg-[#f5f4fb] border-[#e7e7f0] text-[#c4c1d6] line-through cursor-not-allowed",
+                              !chosen && !booked && "border-[#e7e7f0] bg-white text-[#36354c] hover:border-[#7c47e1]/50",
+                              windowOff && "pointer-events-none cursor-not-allowed opacity-50"
+                            )}
+                          >
+                            {label}
+                          </button>
+                        </FlexTooltip>
                       );
                     })}
                     {chips.length < 4 &&
@@ -433,6 +535,7 @@ const RescheduleCallModal = ({
             {confirmLabel}
           </Button>
         </div>
+        </TooltipProvider>
       </DialogContent>
     </Dialog>
   );
