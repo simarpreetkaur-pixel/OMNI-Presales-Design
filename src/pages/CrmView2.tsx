@@ -17,7 +17,6 @@ import {
   ChevronRight,
   Headset,
   Check,
-  Sparkles,
   Wrench,
   Infinity as InfinityIcon,
   ChevronDown,
@@ -61,6 +60,7 @@ import Phase3NextBestActions, {
 } from "@/components/Phase3AgentFeed";
 import Phase3CallCaptionRibbon from "@/components/Phase3CallCaptionRibbon";
 import ackoFabIcon from "@/assets/acko-fab-icon.png";
+import LeadSummary from "@/components/LeadSummary";
 
 type Phase3Mode = "listen" | "agent";
 
@@ -1019,67 +1019,9 @@ const CrmView2 = () => {
                 </div>
               )}
 
-              {/* Phase I: Nudge card (always visible until marked as read) */}
+              {/* Phase I: Agent-ready lead context */}
               {phase === "phase1" && !nudgeRead && (
-                <div
-                  className="rounded-2xl p-[2px] shrink-0"
-                  style={{
-                    background: "linear-gradient(to right, rgba(9,48,101,0.6) 0%, rgba(19,105,235,0.6) 27.5%, rgba(250,197,21,0.6) 60%, rgba(134,203,60,0.6) 100%)",
-                  }}
-                >
-                  <div className="bg-white rounded-2xl p-4 space-y-3">
-                    {/* Header row */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-foreground">
-                        {isPooja ? "AI Summary:" : "Conversation cues:"}
-                      </span>
-                      <button
-                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        onClick={() => setNudgeRead(true)}
-                      >
-                        <Check className="h-3 w-3" />
-                        MARK AS READ
-                      </button>
-                    </div>
-                    {/* Cue pills — Rajesh (original) and Rajesh 2 only */}
-                    {!isPooja && (
-                      <div className="flex flex-wrap gap-2">
-                        {["ACKO customer since 4 years", "Bike Policy currently active"].map((cue) => (
-                          <span
-                            key={cue}
-                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border"
-                            style={{ backgroundColor: "#F0FDF4", borderColor: "#BBF7D0", color: "#15803D" }}
-                          >
-                            {cue}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {/* AI Summary — Rajesh 2 and Pooja only */}
-                    {(isRajesh2 || isPooja) && (
-                      <div className="pt-0.5 space-y-1.5">
-                        {!isPooja && (
-                          <div className="flex items-center gap-1.5">
-                            <Sparkles className="h-3.5 w-3.5 text-primary" />
-                            <span className="text-sm font-medium text-foreground">AI Summary:</span>
-                          </div>
-                        )}
-                        {(isPooja ? [
-                          "Customer asked for comparison between HDFC Ergo and Platinum Lite",
-                          "Mentioned to discuss with Husband and make decision.",
-                        ] : [
-                          "Discussed RSA and Zero Dep",
-                          "Will discuss with wife and finalise",
-                        ]).map((point, i) => (
-                          <div key={i} className="flex items-start gap-2">
-                            <span className="mt-1.5 text-[5px] shrink-0" style={{ color: "#5B5675" }}>●</span>
-                            <p className="text-sm font-normal leading-relaxed" style={{ color: "#5B5675" }}>{point}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <LeadSummary />
               )}
 
               {/* Chat Messages */}
