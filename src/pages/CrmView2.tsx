@@ -57,6 +57,7 @@ import Phase3CallCaptionRibbon from "@/components/Phase3CallCaptionRibbon";
 import ackoFabIcon from "@/assets/acko-fab-icon.png";
 import AppHeader from "@/components/AppHeader";
 import AgentNotesPanel from "@/components/AgentNotesPanel";
+import MotorQuoteCreator from "@/components/MotorQuoteCreator";
 import PostCallActionRibbon from "@/components/PostCallActionRibbon";
 import DNDConfirmModal from "@/components/DNDConfirmModal";
 import {
@@ -319,6 +320,7 @@ const CrmView2 = () => {
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
   const [rightPanelExpanded, setRightPanelExpanded] = useState(true);
   const [rightRail, setRightRail] = useState<"tools" | "notes">("tools");
+  const [phase1QuoteOpen, setPhase1QuoteOpen] = useState(false);
   const [postCallSecondsRemaining, setPostCallSecondsRemaining] = useState<number | null>(null);
   const [showDNDConfirm, setShowDNDConfirm] = useState(false);
   /** Phase II/III: which right-rail tool is open; null = panel closed */
@@ -695,7 +697,11 @@ const CrmView2 = () => {
     }, 1200);
   };
 
-  const handlePowerToolClick = (_tool: string) => {
+  const handlePowerToolClick = (tool: string) => {
+    if (tool === "Quote Creator") {
+      setPhase1QuoteOpen(true);
+      return;
+    }
     window.open("/lead-360", "_blank");
   };
 
@@ -756,7 +762,9 @@ const CrmView2 = () => {
           ? rightRail === "notes"
             ? "grid-cols-[328px_1fr_303px_63px]"
             : rightPanelExpanded
-            ? "grid-cols-[328px_1fr_260px_63px]"
+            ? phase1QuoteOpen
+              ? "grid-cols-[328px_1fr_360px_63px]"
+              : "grid-cols-[328px_1fr_260px_63px]"
             : "grid-cols-[328px_1fr_63px]"
           : quoteBuilderOpen
             ? leftPaneCollapsed
@@ -1311,31 +1319,35 @@ const CrmView2 = () => {
           </div>
         )}
 
-        {/* Phase I — Power Tools expanded list */}
+        {/* Phase I — Power Tools expanded list / in-app Quote Creator */}
         {phase === "phase1" && rightRail === "tools" && rightPanelExpanded && (
-          <aside className="bg-white shadow-[-2px_0_4px_rgba(0,0,0,0.09)] z-[1] flex flex-col overflow-y-auto">
-            <div className="p-6 w-full">
-              <div className="flex flex-col gap-3 w-full">
-                {powerTools.map((tool) => {
-                  const Icon = tool.icon;
-                  return (
-                    <button
-                      key={tool.label}
-                      type="button"
-                      onClick={() => handlePowerToolClick(tool.label)}
-                      className="w-full flex items-center gap-4 px-4 py-3 rounded-xl border border-[rgba(208,189,244,0.6)] bg-white shadow-[0_1px_3px_rgba(54,53,76,0.06)] hover:bg-[#f8f7fc] cursor-pointer transition-colors text-left"
-                    >
-                      <div className="size-10 rounded-lg bg-[#efe9fb] flex items-center justify-center shrink-0">
-                        <Icon className="size-6 text-[#7c47e1]" strokeWidth={1.75} />
-                      </div>
-                      <span className="text-sm font-medium text-[#36354c] leading-5">
-                        {tool.label}
-                      </span>
-                    </button>
-                  );
-                })}
+          <aside className="z-[1] flex min-h-0 flex-col overflow-hidden bg-white shadow-[-2px_0_4px_rgba(0,0,0,0.09)]">
+            {phase1QuoteOpen ? (
+              <MotorQuoteCreator onBack={() => setPhase1QuoteOpen(false)} />
+            ) : (
+              <div className="w-full overflow-y-auto p-6">
+                <div className="flex w-full flex-col gap-3">
+                  {powerTools.map((tool) => {
+                    const Icon = tool.icon;
+                    return (
+                      <button
+                        key={tool.label}
+                        type="button"
+                        onClick={() => handlePowerToolClick(tool.label)}
+                        className="flex w-full cursor-pointer items-center gap-4 rounded-xl border border-[rgba(208,189,244,0.6)] bg-white px-4 py-3 text-left shadow-[0_1px_3px_rgba(54,53,76,0.06)] transition-colors hover:bg-[#f8f7fc]"
+                      >
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#efe9fb]">
+                          <Icon className="size-6 text-[#7c47e1]" strokeWidth={1.75} />
+                        </div>
+                        <span className="text-sm font-medium leading-5 text-[#36354c]">
+                          {tool.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </aside>
         )}
 
