@@ -8,16 +8,16 @@ import RescheduleCallModal from "@/components/RescheduleCallModal";
 import NotInterestedChecklistModal from "@/components/NotInterestedChecklistModal";
 import DNDConfirmModal from "@/components/DNDConfirmModal";
 import {
-  RAJESH_LAST_CALL_SUMMARY_BULLETS,
-  RAJESH_LAST_CALL_SUMMARY_LABEL,
-} from "@/data/rajeshLastCallSummary";
+  SAMPADA_THIRD_LAST_CALL_BULLETS,
+  SAMPADA_THIRD_LAST_CALL_LABEL,
+} from "@/data/sampadaThirdCall";
 
-interface OutgoingCallModal2Props {
+interface OutgoingCallModalThirdCallProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const OutgoingCallModal2 = ({ open, onOpenChange }: OutgoingCallModal2Props) => {
+const OutgoingCallModalThirdCall = ({ open, onOpenChange }: OutgoingCallModalThirdCallProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const [timer, setTimer] = useState(0);
   const [showReschedule, setShowReschedule] = useState(false);
@@ -51,9 +51,8 @@ const OutgoingCallModal2 = ({ open, onOpenChange }: OutgoingCallModal2Props) => 
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-full max-w-md p-0 gap-0 overflow-hidden border-border shadow-xl rounded-[24px] [&>button:last-child]:hidden">
-          <DialogTitle className="sr-only">AI Summary Available – Rajesh Kumar</DialogTitle>
+          <DialogTitle className="sr-only">3rd call – Sampada Tambolkar</DialogTitle>
 
-          {/* Header */}
           <div className="flex h-12 shrink-0 items-center justify-start gap-2 px-5 border-b border-[#f0f0f6] bg-white">
             {!isConnected ? (
               <>
@@ -76,27 +75,25 @@ const OutgoingCallModal2 = ({ open, onOpenChange }: OutgoingCallModal2Props) => 
             )}
           </div>
 
-          {/* Profile Banner */}
           <div className="bg-[#f3f7ff] py-3 px-6 flex flex-col items-center gap-2">
             <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center shadow-sm">
               <UserRound className="h-8 w-8 text-[#36354c]" />
             </div>
             <div className="flex flex-col items-center gap-1">
-              <h2 className="text-xl font-semibold text-[#36354c] tracking-[-0.1px]">Rajesh Kumar</h2>
+              <h2 className="text-xl font-semibold text-[#36354c] tracking-[-0.1px]">Sampada Tambolkar</h2>
               <div className="flex items-center gap-3 flex-wrap justify-center">
                 <div className="flex items-center gap-1">
                   <Award className="h-4 w-4 text-[#5b5675]" />
-                  <span className="text-sm text-[#5b5675]">Existing Customer</span>
+                  <span className="text-sm text-[#5b5675]">New customer</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Globe className="h-4 w-4 text-[#5b5675]" />
-                  <span className="text-sm text-[#5b5675]">Hindi</span>
+                  <span className="text-sm text-[#5b5675]">English</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Call Context */}
           <div className="px-6 pt-4 pb-0 bg-white">
             <div className="flex items-center gap-1 mb-3">
               <ClipboardList className="h-5 w-5 text-[#5b5675]" />
@@ -105,34 +102,33 @@ const OutgoingCallModal2 = ({ open, onOpenChange }: OutgoingCallModal2Props) => 
             <div className="rounded-xl border border-[#e7e7f0] p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#5b5675] opacity-80">Call type</span>
-                <Badge className="bg-[#e3fafc] text-[#0895aa] hover:bg-[#e3fafc] border-0 px-2 py-0.5 rounded-md font-medium text-xs">
-                  Fresh lead
+                <Badge className="bg-[#efe9fb] text-[#7c47e1] hover:bg-[#efe9fb] border-0 px-2 py-0.5 rounded-md font-medium text-xs">
+                  Callback
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#5b5675] opacity-80">Vehicle</span>
-                <span className="text-sm font-medium text-[#040222] text-right">Honda Amaze 2025</span>
+                <span className="text-sm font-medium text-[#040222] text-right">Kia Sonet 2024</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#5b5675] opacity-80">Last activity</span>
                 <div className="bg-[#f8f7fc] px-2.5 py-1 rounded-md flex items-center gap-1.5">
                   <Smartphone className="h-4 w-4 text-[#36354c]" />
-                  <span className="text-xs font-medium text-[#36354c]">Mobile app</span>
+                  <span className="text-xs font-medium text-[#36354c]">WhatsApp</span>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#5b5675] opacity-80">Dropped off at</span>
-                <span className="text-sm font-medium text-[#040222]">Payment Page</span>
+                <span className="text-sm font-medium text-[#040222]">Payment pending</span>
               </div>
 
-              {/* Last call summary */}
               <div className="bg-[#f8f7fc] rounded-xl p-3 space-y-3">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-[#7c47e1]" />
-                  <span className="text-sm font-small text-[#36354c]">{RAJESH_LAST_CALL_SUMMARY_LABEL}:</span>
+                  <span className="text-sm font-small text-[#36354c]">{SAMPADA_THIRD_LAST_CALL_LABEL}:</span>
                 </div>
                 <div className="space-y-2">
-                  {RAJESH_LAST_CALL_SUMMARY_BULLETS.map((bullet) => (
+                  {SAMPADA_THIRD_LAST_CALL_BULLETS.map((bullet) => (
                     <div key={bullet} className="flex gap-2">
                       <div className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#36354c]" />
                       <span className="text-sm text-[#36354c]">{bullet}</span>
@@ -143,7 +139,6 @@ const OutgoingCallModal2 = ({ open, onOpenChange }: OutgoingCallModal2Props) => 
             </div>
           </div>
 
-          {/* Footer CTAs */}
           <div className="px-6 pb-4 pt-4 flex items-center gap-3 bg-white">
             <Button
               variant="outline"
@@ -163,7 +158,7 @@ const OutgoingCallModal2 = ({ open, onOpenChange }: OutgoingCallModal2Props) => 
             <Button
               className="rounded-xl h-12 flex-1 text-sm font-medium bg-[#7c47e1] border-[#7c47e1] hover:bg-[#5920c5] text-white"
               disabled={!isConnected}
-              onClick={() => { onOpenChange(false); navigate("/crm2", { state: { customer: "rajesh" } }); }}>
+              onClick={() => { onOpenChange(false); navigate("/crm2", { state: { customer: "third-call" } }); }}>
               Continue
             </Button>
           </div>
@@ -173,20 +168,24 @@ const OutgoingCallModal2 = ({ open, onOpenChange }: OutgoingCallModal2Props) => 
       <RescheduleCallModal
         open={showReschedule}
         onOpenChange={setShowReschedule}
+        customerName="Sampada Tambolkar"
+        product="Car_Comprehensive"
         onBack={() => { setShowReschedule(false); onOpenChange(true); }} />
 
       <NotInterestedChecklistModal
         open={showNotInterested}
         onOpenChange={setShowNotInterested}
+        customerName="Sampada Tambolkar"
         onBack={() => { setShowNotInterested(false); onOpenChange(true); }}
         onEnableDND={() => setShowDNDConfirm(true)} />
 
       <DNDConfirmModal
         open={showDNDConfirm}
         onOpenChange={setShowDNDConfirm}
+        customerName="Sampada Tambolkar"
         onBack={() => { setShowDNDConfirm(false); setShowNotInterested(true); }} />
     </>
   );
 };
 
-export default OutgoingCallModal2;
+export default OutgoingCallModalThirdCall;

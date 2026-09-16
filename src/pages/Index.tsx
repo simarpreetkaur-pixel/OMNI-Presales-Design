@@ -7,12 +7,22 @@ import bgGradient from "@/assets/bg-gradient.png";
 import ackoFabIcon from "@/assets/acko-fab-icon.png";
 import callbackIllustration from "@/assets/callback-illustration.png";
 import OutgoingCallModal2 from "@/components/OutgoingCallModal2";
+import OutgoingCallModal3 from "@/components/OutgoingCallModal3";
+import OutgoingCallModalSecondCall from "@/components/OutgoingCallModalSecondCall";
+import OutgoingCallModalThirdCall from "@/components/OutgoingCallModalThirdCall";
+import OutgoingCallModalFourthCall from "@/components/OutgoingCallModalFourthCall";
+import OutgoingCallModalFifthCall from "@/components/OutgoingCallModalFifthCall";
 import ScheduledFollowUpsDashboard from "@/components/FigmaScheduledFollowUpsDashboard";
 
 const Index = () => {
   const location = useLocation();
   const [showCallOptions, setShowCallOptions] = useState(false);
   const [showOutgoingCall2, setShowOutgoingCall2] = useState(false);
+  const [showFirstCall, setShowFirstCall] = useState(false);
+  const [showSecondCall, setShowSecondCall] = useState(false);
+  const [showThirdCall, setShowThirdCall] = useState(false);
+  const [showFourthCall, setShowFourthCall] = useState(false);
+  const [showFifthCall, setShowFifthCall] = useState(false);
   const [showCallbackConfirm, setShowCallbackConfirm] = useState(false);
 
   useEffect(() => {
@@ -67,20 +77,92 @@ const Index = () => {
         {/* Simulate Call FAB - Bottom Right */}
         <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3">
           {showCallOptions && (
-            <Button
-              variant="outline"
-              className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
-              onClick={() => {
-                setShowOutgoingCall2(true);
-                setShowCallOptions(false);
-              }}
-            >
-              <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
-              <div className="text-left">
-                <p className="text-sm font-semibold leading-tight text-onyx-800">Rajesh Kumar</p>
-                <p className="text-xs font-normal text-onyx-500">Outgoing call</p>
-              </div>
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
+                onClick={() => {
+                  setShowOutgoingCall2(true);
+                  setShowCallOptions(false);
+                }}
+              >
+                <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold leading-tight text-onyx-800">Rajesh Kumar</p>
+                  <p className="text-xs font-normal text-onyx-500">Outgoing call</p>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
+                onClick={() => {
+                  setShowFirstCall(true);
+                  setShowCallOptions(false);
+                }}
+              >
+                <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold leading-tight text-onyx-800">1st call</p>
+                  <p className="text-xs font-normal text-onyx-500">Sampada Tambolkar</p>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
+                onClick={() => {
+                  setShowSecondCall(true);
+                  setShowCallOptions(false);
+                }}
+              >
+                <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold leading-tight text-onyx-800">2nd call</p>
+                  <p className="text-xs font-normal text-onyx-500">Sampada Tambolkar</p>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
+                onClick={() => {
+                  setShowThirdCall(true);
+                  setShowCallOptions(false);
+                }}
+              >
+                <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold leading-tight text-onyx-800">3rd call</p>
+                  <p className="text-xs font-normal text-onyx-500">Sampada Tambolkar</p>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
+                onClick={() => {
+                  setShowFourthCall(true);
+                  setShowCallOptions(false);
+                }}
+              >
+                <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold leading-tight text-onyx-800">4th call</p>
+                  <p className="text-xs font-normal text-onyx-500">Sampada Tambolkar</p>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="min-w-[220px] gap-3 rounded-2xl border-onyx-300 bg-card px-5 py-3 h-auto shadow-lg hover:border-purple-600/40 hover:bg-card"
+                onClick={() => {
+                  setShowFifthCall(true);
+                  setShowCallOptions(false);
+                }}
+              >
+                <PhoneOutgoing className="h-5 w-5 shrink-0 text-primary" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold leading-tight text-onyx-800">5th call</p>
+                  <p className="text-xs font-normal text-onyx-500">Sampada Tambolkar</p>
+                </div>
+              </Button>
+            </>
           )}
           <Button
             size="default"
@@ -94,6 +176,11 @@ const Index = () => {
       </main>
 
       <OutgoingCallModal2 open={showOutgoingCall2} onOpenChange={setShowOutgoingCall2} />
+      <OutgoingCallModal3 open={showFirstCall} onOpenChange={setShowFirstCall} />
+      <OutgoingCallModalSecondCall open={showSecondCall} onOpenChange={setShowSecondCall} />
+      <OutgoingCallModalThirdCall open={showThirdCall} onOpenChange={setShowThirdCall} />
+      <OutgoingCallModalFourthCall open={showFourthCall} onOpenChange={setShowFourthCall} />
+      <OutgoingCallModalFifthCall open={showFifthCall} onOpenChange={setShowFifthCall} />
 
       <Dialog open={showCallbackConfirm} onOpenChange={setShowCallbackConfirm}>
         <DialogContent className="gap-0 rounded-[24px] border-onyx-300 p-8 text-center shadow-xl sm:max-w-[380px]">

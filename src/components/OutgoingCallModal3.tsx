@@ -46,8 +46,8 @@ const OutgoingCallModal3 = ({ open, onOpenChange }: OutgoingCallModal3Props) => 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-full max-w-md p-0 gap-0 overflow-hidden border-border shadow-xl rounded-[24px]">
-          <DialogTitle className="sr-only">Fresh Lead – Rajesh Kumar</DialogTitle>
+        <DialogContent className="w-full max-w-md p-0 gap-0 overflow-hidden border-border shadow-xl rounded-[24px] [&>button:last-child]:hidden">
+          <DialogTitle className="sr-only">1st call – Sampada Tambolkar</DialogTitle>
 
           {/* Header */}
           <div className="flex h-12 shrink-0 items-center justify-start gap-2 px-5 border-b border-[#f0f0f6] bg-white">
@@ -78,15 +78,15 @@ const OutgoingCallModal3 = ({ open, onOpenChange }: OutgoingCallModal3Props) => 
               <UserRound className="h-8 w-8 text-[#36354c]" />
             </div>
             <div className="flex flex-col items-center gap-1">
-              <h2 className="text-xl font-semibold text-[#36354c] tracking-[-0.1px]">Rajesh Kumar</h2>
+              <h2 className="text-xl font-semibold text-[#36354c] tracking-[-0.1px]">Sampada Tambolkar</h2>
               <div className="flex items-center gap-3 flex-wrap justify-center">
                 <div className="flex items-center gap-1">
                   <Award className="h-4 w-4 text-[#5b5675]" />
-                  <span className="text-sm text-[#5b5675]">Existing customer</span>
+                  <span className="text-sm text-[#5b5675]">New customer</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Globe className="h-4 w-4 text-[#5b5675]" />
-                  <span className="text-sm text-[#5b5675]">Hindi</span>
+                  <span className="text-sm text-[#5b5675]">English</span>
                 </div>
               </div>
             </div>
@@ -107,7 +107,7 @@ const OutgoingCallModal3 = ({ open, onOpenChange }: OutgoingCallModal3Props) => 
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#5b5675] opacity-80">Vehicle</span>
-                <span className="text-sm font-medium text-[#040222] text-right">Honda Amaze 2025</span>
+                <span className="text-sm font-medium text-[#040222] text-right">Kia Sonet 2024</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#5b5675] opacity-80">Last activity</span>
@@ -118,7 +118,7 @@ const OutgoingCallModal3 = ({ open, onOpenChange }: OutgoingCallModal3Props) => 
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#5b5675] opacity-80">Dropped off at</span>
-                <span className="text-sm font-medium text-[#040222]">Payment Page</span>
+                <span className="text-sm font-medium text-[#040222]">Quote page</span>
               </div>
             </div>
           </div>
@@ -143,7 +143,7 @@ const OutgoingCallModal3 = ({ open, onOpenChange }: OutgoingCallModal3Props) => 
             <Button
               className="rounded-xl h-12 flex-1 text-sm font-medium bg-[#7c47e1] border-[#7c47e1] hover:bg-[#5920c5] text-white"
               disabled={!isConnected}
-              onClick={() => { onOpenChange(false); navigate("/crm2", { state: { customer: "rajesh2" } }); }}>
+              onClick={() => { onOpenChange(false); navigate("/crm2", { state: { customer: "first-call" } }); }}>
               Continue
             </Button>
           </div>
@@ -153,17 +153,20 @@ const OutgoingCallModal3 = ({ open, onOpenChange }: OutgoingCallModal3Props) => 
       <RescheduleCallModal
         open={showReschedule}
         onOpenChange={setShowReschedule}
+        customerName="Sampada Tambolkar"
         onBack={() => { setShowReschedule(false); onOpenChange(true); }} />
 
       <NotInterestedChecklistModal
         open={showNotInterested}
         onOpenChange={setShowNotInterested}
+        customerName="Sampada Tambolkar"
         onBack={() => { setShowNotInterested(false); onOpenChange(true); }}
         onEnableDND={() => setShowDNDConfirm(true)} />
 
       <DNDConfirmModal
         open={showDNDConfirm}
         onOpenChange={setShowDNDConfirm}
+        customerName="Sampada Tambolkar"
         onBack={() => { setShowDNDConfirm(false); setShowNotInterested(true); }} />
     </>
   );

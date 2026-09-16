@@ -1,7 +1,7 @@
 import { LayoutGrid } from "lucide-react";
 
 interface OzontelPanelProps {
-  customer: "rajesh" | "rajesh2" | "pooja";
+  customer: "rajesh" | "rajesh2" | "pooja" | "sampada";
   onEndCall: () => void;
 }
 
@@ -9,6 +9,7 @@ const customerData = {
   rajesh: { name: "Rajesh Kumar", phone: "+91 98200 25524", initials: "RK" },
   rajesh2: { name: "Rajesh Kumar", phone: "+91 98200 25524", initials: "RK" },
   pooja: { name: "Pooja Arora", phone: "+91 99100 48231", initials: "PA" },
+  sampada: { name: "Sampada Tambolkar", phone: "+91 ••••• 2680", initials: "ST" },
 };
 
 const OzontelPanel = ({ customer, onEndCall }: OzontelPanelProps) => {
