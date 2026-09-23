@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { SAMPADA_LAST_CALL_SUMMARY_BULLETS } from "@/data/sampadaSecondCall";
 
 type ScheduleDay = "today" | "tomorrow";
 
@@ -14,6 +15,7 @@ type ScheduledCall = {
   customerName: string;
   campaign: string;
   summary: string;
+  summaryBullets?: readonly string[];
 };
 
 const HOUR_START = 8;
@@ -108,6 +110,14 @@ const SCHEDULE: Record<ScheduleDay, ScheduledCall[]> = {
       campaign: "life_campaign_name",
       summary:
         "Rahul is evaluating renewal options. Reconfirm his current insurer, no-claim bonus, and preferred add-ons before sharing the final quote.",
+    },
+    {
+      id: "sampada-800",
+      minutes: 20 * 60,
+      customerName: "Sampada Tambolkar",
+      campaign: "car_campaign_name",
+      summary: SAMPADA_LAST_CALL_SUMMARY_BULLETS.join(" "),
+      summaryBullets: SAMPADA_LAST_CALL_SUMMARY_BULLETS,
     },
   ],
   tomorrow: [
@@ -500,7 +510,18 @@ const FigmaScheduledFollowUpsDashboard = () => {
                   <Sparkles className="size-5 text-[#7c47e1]" strokeWidth={1.8} />
                   <p className="text-sm font-medium leading-5 text-[#36354c]">Quick Summary:</p>
                 </div>
-                <p className="mt-2 text-sm font-normal leading-5 text-[#5b5675]">{selectedCall.summary}</p>
+                {selectedCall.summaryBullets ? (
+                  <div className="mt-2 space-y-2">
+                    {selectedCall.summaryBullets.map((bullet) => (
+                      <div key={bullet} className="flex gap-2">
+                        <div className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#36354c]" />
+                        <p className="text-sm font-normal leading-5 text-[#5b5675]">{bullet}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-2 text-sm font-normal leading-5 text-[#5b5675]">{selectedCall.summary}</p>
+                )}
               </div>
             </Card>
             ) : (

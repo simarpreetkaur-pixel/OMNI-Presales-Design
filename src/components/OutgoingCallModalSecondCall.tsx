@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Phone, UserRound, Globe, Award, ClipboardList, Smartphone, CalendarDays, Sparkles } from "lucide-react";
+import { Phone, UserRound, Globe, Award, ClipboardList, CalendarDays, Sparkles } from "lucide-react";
 import RescheduleCallModal from "@/components/RescheduleCallModal";
 import NotInterestedChecklistModal from "@/components/NotInterestedChecklistModal";
 import DNDConfirmModal from "@/components/DNDConfirmModal";
@@ -102,24 +102,13 @@ const OutgoingCallModalSecondCall = ({ open, onOpenChange }: OutgoingCallModalSe
             <div className="rounded-xl border border-[#e7e7f0] p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#5b5675] opacity-80">Call type</span>
-                <Badge className="bg-[#efe9fb] text-[#7c47e1] hover:bg-[#efe9fb] border-0 px-2 py-0.5 rounded-md font-medium text-xs">
-                  Callback
+                <Badge className="bg-[#e3fafc] text-[#0895aa] hover:bg-[#e3fafc] border-0 px-2 py-0.5 rounded-md font-medium text-xs">
+                  Fresh lead
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#5b5675] opacity-80">Vehicle</span>
                 <span className="text-sm font-medium text-[#040222] text-right">Kia Sonet 2024</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-[#5b5675] opacity-80">Last activity</span>
-                <div className="bg-[#f8f7fc] px-2.5 py-1 rounded-md flex items-center gap-1.5">
-                  <Smartphone className="h-4 w-4 text-[#36354c]" />
-                  <span className="text-xs font-medium text-[#36354c]">WhatsApp</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-[#5b5675] opacity-80">Dropped off at</span>
-                <span className="text-sm font-medium text-[#040222]">Quote shared</span>
               </div>
 
               <div className="bg-[#f8f7fc] rounded-xl p-3 space-y-3">

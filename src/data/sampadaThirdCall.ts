@@ -1,4 +1,5 @@
 import { SAMPADA_QUOTES_AFTER_2 } from "@/data/sampadaQuotes";
+import type { ObjectionItem } from "@/data/objections";
 
 export const SAMPADA_THIRD_LAST_CALL_LABEL = "Last call summary";
 
@@ -25,11 +26,23 @@ export const SAMPADA_THIRD_TOPIC_BULLETS = {
     "On the next call she still spoke for the household and asked for the revised pay link. Decision maker is unchanged.",
   ],
   Objections: [
-    "Max IDV first felt almost double versus ₹6,025. She later accepted ~₹13L IDV and the ₹17,145 revised quote.",
-    "She skipped engine protect (car is not in low-lying areas), accessories, and RSA. Those are closed.",
-  ],
+    {
+      objection: "Max IDV premium felt almost double versus ₹6,025.",
+      rebuttal: "Set max IDV and shared ₹17,145 on SMS, email, and WhatsApp.",
+      resolved: true,
+    },
+    {
+      objection: "Needed add-ons explained on the revised quote.",
+      rebuttal: "Explained add-ons; added RTI, passenger protect, and NCB protect.",
+      resolved: true,
+    },
+  ] satisfies readonly ObjectionItem[],
   "Competitor mentions": [
     "Current policy is with Go Digit. ACKO first showed expiry Aug 2025; she said it is active till 22 Aug 2026.",
     "Digit vs ACKO was never compared. She is still proceeding on the ACKO payment link.",
+  ],
+  Payment: [
+    "Pay link sent. She said she will pay now.",
+    "Payment is not confirmed.",
   ],
 } as const;

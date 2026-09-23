@@ -1,4 +1,5 @@
 import { SAMPADA_QUOTES_AFTER_4 } from "@/data/sampadaQuotes";
+import type { ObjectionItem } from "@/data/objections";
 
 export const SAMPADA_FIFTH_LAST_CALL_LABEL = "Last call summary";
 
@@ -24,11 +25,28 @@ export const SAMPADA_FIFTH_TOPIC_BULLETS = {
     "She will ask him to buy from another company.",
   ],
   Objections: [
-    "₹22,250 was not the lower plan they had discussed. NCB could not be changed from 0%.",
-    "Fixing IDV to ~₹13.61L made the premium ₹36,000. Two hours on a broken link, then a wrong app quote. She stopped.",
-  ],
+    {
+      objection: "App Zero Dep showed ₹22,250 — not the plan discussed.",
+      rebuttal: "Guided her through the app; asked her to edit car details when wrong plan showed.",
+      resolved: false,
+    },
+    {
+      objection: "NCB stuck at 0%; could not select 20% or 25%.",
+      rebuttal: "Corrected policy date to 23 Aug; tried fixing 20% NCB from backend.",
+      resolved: false,
+    },
+    {
+      objection: "IDV at ~₹13.61L pushed premium to ₹36,000 on app checkout.",
+      rebuttal: "Had her adjust IDV on app; apologised when premium jumped.",
+      resolved: false,
+    },
+  ] satisfies readonly ObjectionItem[],
   "Competitor mentions": [
     "Current policy is with Go Digit. Expiry on ACKO vs her records (22 Aug 2026) was never closed.",
     "She said her husband will buy from some other company. Digit vs ACKO was never compared.",
+  ],
+  Payment: [
+    "Two hours on a broken checkout, then a wrong app quote. She stopped.",
+    "NCB stuck at 0%. She could not select 20% or 25%.",
   ],
 } as const;

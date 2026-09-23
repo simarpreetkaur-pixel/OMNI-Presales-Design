@@ -222,7 +222,7 @@ const CrmView2 = () => {
           : "grid-cols-[328px_1fr_63px]"
       )}>
         {/* Left Pane -- Customer Data */}
-        <aside className="relative bg-card shadow-[2px_0_12px_rgba(0,0,0,0.06)] z-10 flex flex-col overflow-hidden">
+        <aside className="relative z-20 flex flex-col overflow-hidden border-r border-[#e7e7f0] bg-card shadow-[2px_0_4px_rgba(54,53,76,0.05)]">
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
             {/* Container 1: Customer Details */}
             <div className="rounded-xl border border-onyx-300 p-4 space-y-3">
@@ -348,28 +348,27 @@ const CrmView2 = () => {
         </aside>
 
         {/* Center Pane -- AI Chat */}
-        <main className="flex-1 flex flex-col bg-muted overflow-hidden">
-          <ScrollArea className="flex-1 px-6 py-6" ref={scrollRef}>
+        <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted">
+          {!nudgeRead && (
+            <LeadSummary
+              variant={
+                isFirstCall
+                  ? "first-call"
+                  : isSecondCall
+                    ? "second-call"
+                    : isThirdCall
+                      ? "third-call"
+                      : isFourthCall
+                        ? "fourth-call"
+                        : isFifthCall
+                          ? "fifth-call"
+                          : "default"
+              }
+            />
+          )}
+
+          <ScrollArea className="min-h-0 flex-1 px-6 py-6" ref={scrollRef}>
             <div className="space-y-6">
-
-              {!nudgeRead && (
-                <LeadSummary
-                  variant={
-                    isFirstCall
-                      ? "first-call"
-                      : isSecondCall
-                        ? "second-call"
-                        : isThirdCall
-                          ? "third-call"
-                          : isFourthCall
-                            ? "fourth-call"
-                            : isFifthCall
-                              ? "fifth-call"
-                              : "default"
-                  }
-                />
-              )}
-
               {/* Chat Messages */}
               {chatMessages.map((msg, idx) => (
                 <div
@@ -489,7 +488,7 @@ const CrmView2 = () => {
 
         {/* Power Tools expanded list */}
         {rightPanelExpanded && (
-          <aside className="bg-white shadow-[-2px_0_4px_rgba(0,0,0,0.09)] z-[1] flex flex-col overflow-y-auto">
+          <aside className="relative z-20 flex flex-col overflow-y-auto border-l border-[#e7e7f0] bg-white shadow-[-2px_0_4px_rgba(54,53,76,0.05)]">
             <div className="p-6 w-full">
               <div className="flex flex-col gap-3 w-full">
                 {powerTools.map((tool) => {
@@ -528,7 +527,10 @@ const CrmView2 = () => {
               setRightPanelExpanded((prev) => !prev);
             }
           }}
-          className="group relative z-[2] w-[63px] min-w-[63px] bg-white border-l border-[#e7e7f0] shadow-none flex flex-col items-center pt-4 gap-1.5 cursor-pointer select-none"
+          className={cn(
+            "group relative z-20 flex w-[63px] min-w-[63px] cursor-pointer select-none flex-col items-center gap-1.5 border-l border-[#e7e7f0] bg-white pt-4",
+            !rightPanelExpanded && "shadow-[-2px_0_4px_rgba(54,53,76,0.05)]",
+          )}
         >
           <div
             className={cn(

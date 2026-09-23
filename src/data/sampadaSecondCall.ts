@@ -1,4 +1,5 @@
 import { SAMPADA_QUOTES_AFTER_1 } from "@/data/sampadaQuotes";
+import type { ObjectionItem } from "@/data/objections";
 
 export const SAMPADA_LAST_CALL_SUMMARY_LABEL = "Last call summary";
 
@@ -25,9 +26,17 @@ export const SAMPADA_TOPIC_BULLETS = {
     "She asked for a callback in 10–15 minutes after she reaches the hospital and calls him.",
   ],
   Objections: [
-    "Max IDV premium feels almost double versus the current ₹6,025 quote.",
-    "She was driving to the hospital and could not pull policy documents to settle the Digit expiry.",
-  ],
+    {
+      objection: "Max IDV premium feels almost double versus ₹6,025.",
+      rebuttal: "Explained the ₹7,326 IDV gap and kept the quote at current IDV for her husband.",
+      resolved: false,
+    },
+    {
+      objection: "Could not pull Digit policy documents while driving to the hospital.",
+      rebuttal: "Updated Digit expiry to 22 Aug 2026; asked her to verify documents on callback.",
+      resolved: false,
+    },
+  ] satisfies readonly ObjectionItem[],
   "Competitor mentions": [
     "Current policy is with Go Digit. ACKO records first showed expiry in Aug 2025; she said it is active till 22 Aug 2026.",
     "ACKO quote was not compared with her Digit policy.",
