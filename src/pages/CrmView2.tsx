@@ -141,6 +141,7 @@ const CrmView2 = () => {
       : "Rajesh Kumar";
   const isSampada = isFirstCall || isSecondCall || isThirdCall || isFourthCall || isFifthCall;
   const [inputValue, setInputValue] = useState("");
+  const [leadSummaryCollapseSignal, setLeadSummaryCollapseSignal] = useState(0);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [nudgeRead] = useState(false);
@@ -351,6 +352,7 @@ const CrmView2 = () => {
         <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted">
           {!nudgeRead && (
             <LeadSummary
+              collapseSignal={leadSummaryCollapseSignal}
               variant={
                 isFirstCall
                   ? "first-call"
@@ -463,6 +465,7 @@ const CrmView2 = () => {
                   <Input
                     placeholder="Ask any question..."
                     value={inputValue}
+                    onFocus={() => setLeadSummaryCollapseSignal((current) => current + 1)}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
