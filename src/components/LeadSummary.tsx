@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ChevronDown, CircleHelp, Target, X } from "lucide-react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -48,6 +49,42 @@ type SummaryTile = {
   healthReasons?: readonly string[];
 };
 
+type CallChecklistItem =
+  | "Recording consent"
+  | "Need captured"
+  | "Decision maker confirmed"
+  | "Objections handled"
+  | "Next step locked";
+
+const CALL_CHECKLIST: readonly CallChecklistItem[] = [
+  "Recording consent",
+  "Need captured",
+  "Decision maker confirmed",
+  "Objections handled",
+  "Next step locked",
+];
+
+const checklistState = (
+  done: readonly CallChecklistItem[],
+): Record<CallChecklistItem, boolean> =>
+  Object.fromEntries(CALL_CHECKLIST.map((item) => [item, done.includes(item)])) as Record<
+    CallChecklistItem,
+    boolean
+  >;
+
+const SAMPADA_CHECKLIST_AFTER_FIRST_CALL = checklistState([
+  "Need captured",
+  "Decision maker confirmed",
+  "Objections handled",
+  "Next step locked",
+]);
+
+const RAJESH_CHECKLIST = checklistState([
+  "Need captured",
+  "Decision maker confirmed",
+  "Objections handled",
+]);
+
 const RAJESH_TOPIC_BULLETS: TopicBullets = {
   "Quote creation": [
     "A Zero Depreciation quote was generated for the Honda Amaze 2025 comprehensive plan.",
@@ -88,6 +125,7 @@ const VARIANT_CONTENT: Record<
     lastCallBullets: readonly string[];
     nbaBullets: readonly string[];
     topicBullets: TopicBullets;
+    checklist: Record<CallChecklistItem, boolean>;
   }
 > = {
   default: {
@@ -106,6 +144,7 @@ const VARIANT_CONTENT: Record<
     lastCallBullets: RAJESH_LAST_CALL_SUMMARY_BULLETS,
     nbaBullets: RAJESH_NEXT_BEST_ACTIONS_BULLETS,
     topicBullets: RAJESH_TOPIC_BULLETS,
+    checklist: RAJESH_CHECKLIST,
   },
   "first-call": {
     stage: "Contacted",
@@ -119,6 +158,7 @@ const VARIANT_CONTENT: Record<
     lastCallBullets: [],
     nbaBullets: [],
     topicBullets: {},
+    checklist: checklistState([]),
   },
   "second-call": {
     stage: "Quote shared",
@@ -136,6 +176,7 @@ const VARIANT_CONTENT: Record<
     lastCallBullets: SAMPADA_LAST_CALL_SUMMARY_BULLETS,
     nbaBullets: SAMPADA_NEXT_BEST_ACTIONS_BULLETS,
     topicBullets: SAMPADA_TOPIC_BULLETS,
+    checklist: SAMPADA_CHECKLIST_AFTER_FIRST_CALL,
   },
   "third-call": {
     stage: "Payment pending",
@@ -153,6 +194,7 @@ const VARIANT_CONTENT: Record<
     lastCallBullets: SAMPADA_THIRD_LAST_CALL_BULLETS,
     nbaBullets: SAMPADA_THIRD_NBA_BULLETS,
     topicBullets: SAMPADA_THIRD_TOPIC_BULLETS,
+    checklist: SAMPADA_CHECKLIST_AFTER_FIRST_CALL,
   },
   "fourth-call": {
     stage: "Payment pending",
@@ -170,6 +212,7 @@ const VARIANT_CONTENT: Record<
     lastCallBullets: SAMPADA_FOURTH_LAST_CALL_BULLETS,
     nbaBullets: SAMPADA_FOURTH_NBA_BULLETS,
     topicBullets: SAMPADA_FOURTH_TOPIC_BULLETS,
+    checklist: SAMPADA_CHECKLIST_AFTER_FIRST_CALL,
   },
   "fifth-call": {
     stage: "Payment pending",
@@ -187,6 +230,7 @@ const VARIANT_CONTENT: Record<
     lastCallBullets: SAMPADA_FIFTH_LAST_CALL_BULLETS,
     nbaBullets: SAMPADA_FIFTH_NBA_BULLETS,
     topicBullets: SAMPADA_FIFTH_TOPIC_BULLETS,
+    checklist: SAMPADA_CHECKLIST_AFTER_FIRST_CALL,
   },
 };
 
@@ -225,6 +269,7 @@ const LeadSummary = ({
   const [healthTooltipPulse, setHealthTooltipPulse] = useState(false);
   const objections = content.topicBullets.Objections ?? [];
   const openObjectionsCount = objections.length;
+  const uncheckedChecklistCount = CALL_CHECKLIST.filter((item) => !content.checklist[item]).length;
   const leadHealthTile = content.tiles.find((tile) => tile.label === "Deal health");
   const alertHealthStatus = isAlertHealthStatus(leadHealthTile?.status)
     ? leadHealthTile.status
@@ -263,11 +308,18 @@ const LeadSummary = ({
         onClick={() => setExpanded((current) => !current)}
         className="flex w-full items-center justify-between text-left"
       >
-        <span className="flex shrink-0 items-center gap-2">
-          <span className="rounded-lg bg-[#efe9fb] p-1.5">
-            <Target className="size-4 text-[#7c47e1]" strokeWidth={2} />
+        <span className="flex min-w-0 flex-1 items-center gap-3">
+          <span className="flex shrink-0 items-center gap-2">
+            <span className="rounded-lg bg-[#efe9fb] p-1.5">
+              <Target className="size-4 text-[#7c47e1]" strokeWidth={2} />
+            </span>
+            <span className="text-xs font-medium leading-[18px] text-[#36354c]">LEAD SUMMARY</span>
           </span>
-          <span className="text-xs font-medium leading-[18px] text-[#36354c]">LEAD SUMMARY</span>
+          {!expanded && (
+            <span className="inline-flex max-w-[min(100%,240px)] shrink truncate rounded-md bg-[#efe9fb] px-2.5 py-1 text-sm font-medium leading-5 text-[#7c47e1]">
+              {content.stage}
+            </span>
+          )}
         </span>
         <ChevronDown
           className={cn(
@@ -292,7 +344,7 @@ const LeadSummary = ({
           )}
         >
         <div className="flex w-full flex-wrap gap-4">
-          <div className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-[9px] border border-[#e7e7f0] p-3">
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-[12px] border border-[#e7e7f0] p-3">
             <div className="flex flex-col gap-0.5">
               <p className="text-xs font-normal leading-[18px] text-[#5b5675]">Current stage</p>
               <p className="text-sm font-medium leading-5 text-[#36354c]">{content.stage}</p>
@@ -322,7 +374,7 @@ const LeadSummary = ({
             return (
               <div
                 key={tile.label}
-                className="flex min-h-[82px] min-w-0 flex-1 flex-col gap-1 rounded-[9px] border border-[#e7e7f0] bg-white p-3"
+                className="flex min-h-[82px] min-w-0 flex-1 flex-col gap-1 rounded-[12px] border border-[#e7e7f0] bg-white p-3"
               >
                 <p className="text-xs font-normal leading-[18px] text-[#5b5675]">{tile.label}</p>
                 <div className="flex items-center gap-1.5">
@@ -392,27 +444,38 @@ const LeadSummary = ({
                 {(
                   [
                     ["objections", "View objections"],
-                    ["profile", "Customer profile"],
                     ["checklist", "Checklist"],
                   ] as const
                 ).map(([value, label]) => (
                   <TabsTrigger
                     key={value}
                     value={value}
-                    className="rounded-full border border-[#e7e7f0] bg-white px-3 py-2 text-[11px] font-medium uppercase tracking-[0.88px] text-[#6d3dd5] shadow-none ring-offset-0 hover:bg-white data-[state=active]:border-[#7c47e1] data-[state=active]:bg-[#7c47e1] data-[state=active]:text-white data-[state=active]:shadow-none"
+                    onMouseDown={(event) => {
+                      if (briefTab !== value || event.button !== 0) return;
+                      event.preventDefault();
+                      setBriefTab("");
+                    }}
+                    onKeyDown={(event) => {
+                      if (briefTab !== value || (event.key !== "Enter" && event.key !== " ")) return;
+                      event.preventDefault();
+                      setBriefTab("");
+                    }}
+                    className="group gap-0.5 rounded-full border border-[#e7e7f0] bg-[#efe9fb] px-3 py-2 text-[11px] font-medium uppercase tracking-[0.88px] text-[#6d3dd5] shadow-none ring-offset-0 hover:bg-[#efe9fb] data-[state=active]:border-[#7c47e1] data-[state=active]:bg-[#7c47e1] data-[state=active]:text-white data-[state=active]:shadow-none"
                   >
                     {label}
+                    {value === "checklist" ? (
+                      <span className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-[#7c47e1] text-[9px] font-semibold leading-none text-white group-data-[state=active]:bg-white group-data-[state=active]:text-[#7c47e1]">
+                        {uncheckedChecklistCount}
+                      </span>
+                    ) : null}
                   </TabsTrigger>
                 ))}
               </TabsList>
               <TabsContent value="objections" className="mt-0">
                 <ObjectionsList items={objections} />
               </TabsContent>
-              <TabsContent value="profile" className="mt-3">
-                <p className="text-sm font-normal leading-5 text-[#5b5675]">content will come here</p>
-              </TabsContent>
               <TabsContent value="checklist" className="mt-3">
-                <p className="text-sm font-normal leading-5 text-[#5b5675]">content will come here</p>
+                <CallChecklist done={content.checklist} />
               </TabsContent>
             </Tabs>
           </>
@@ -425,6 +488,26 @@ const LeadSummary = ({
 };
 
 export default LeadSummary;
+
+function CallChecklist({ done }: { done: Record<CallChecklistItem, boolean> }) {
+  return (
+    <ul className="flex flex-col gap-2.5">
+      {CALL_CHECKLIST.map((item) => (
+        <li key={item}>
+          <div className="flex items-center gap-2.5">
+            <Checkbox
+              checked={done[item]}
+              disabled
+              aria-readonly="true"
+              className="size-4 rounded-[4px] border-[#e7e7f0] disabled:cursor-default disabled:opacity-100 data-[state=checked]:border-[#0fa457] data-[state=checked]:bg-[#0fa457] data-[state=checked]:text-white"
+            />
+            <span className="text-sm font-normal leading-5 text-[#36354c]">{item}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 function ObjectionsList({ items }: { items: readonly ObjectionItem[] }) {
   return (
@@ -474,7 +557,7 @@ function WatchForBanner({
         closing ? "max-h-0 -translate-y-1 opacity-0" : "max-h-40 translate-y-0 opacity-100",
       )}
     >
-      <div className="flex items-start justify-between gap-3 rounded-2xl bg-[#fff7e5] p-[14px]">
+      <div className="flex items-start justify-between gap-3 rounded-[12px] bg-[#fff7e5] p-[14px]">
         <ul className="flex min-w-0 flex-wrap gap-x-4 gap-y-1">
             {reasons.map((reason) => (
               <li key={reason} className="ms-[18px] list-disc text-xs leading-normal text-[#272638]">
@@ -504,7 +587,7 @@ function SparklePanel({
 }) {
   return (
     <div
-      className="flex min-w-0 flex-col gap-1.5 rounded-2xl border border-[#e5e5e5] p-3"
+      className="flex min-w-0 flex-col gap-1.5 rounded-[12px] border border-[#e5e5e5] p-3"
       style={{
         backgroundImage:
           "linear-gradient(180deg, rgba(23, 23, 23, 0) 0%, rgba(109, 61, 213, 0.02) 100%), linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%)",
@@ -522,10 +605,10 @@ function SparklePanel({
           {label}
         </p>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex min-w-0 flex-col gap-3">
         {bullets.map((bullet) => (
-          <ul key={bullet} className="w-full text-sm font-normal text-[#5b5675]">
-            <li className="ms-[21px] list-disc break-words">
+          <ul key={bullet} className="list-disc pl-5 text-sm font-normal text-[#5b5675]">
+            <li className="break-words">
               <span className="leading-5">{bullet}</span>
             </li>
           </ul>
